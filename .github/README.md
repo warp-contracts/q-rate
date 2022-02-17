@@ -116,6 +116,8 @@ Sign a transaction. Raw version of what is used in the `arweave-js` [API](#api).
 
 Requires the `SIGN_TRANSACTION` [permission](#permissions).
 
+> Note: if you are trying to sign a larger chunk of data (5 MB <), make sure to notify the user to not switch / close browser tabs. Signing large datas takes longer and the browser won't send the chunks to the signer in the background.
+
 ### `encrypt(data, options): Promise<Uint8Array>`
 
 Encrypt a string with the user's wallet.
@@ -148,7 +150,7 @@ Decrypt a string [encrypted](#encryptdata-options-promiseuint8array) with the us
 
 Requires the `DECRYPT` [permission](#permissions).
 
-### `signature(data, options): Promise<string>`
+### `signature(data, options): Promise<Uint8Array>`
 
 Get the signature for a data array.
 
@@ -196,6 +198,9 @@ The permissions:
 
 - `SIGN_TRANSACTION`:
   Sign a transaction
+
+- `DISPATCH`:
+  Dispatch (sign and send) a transaction
 
 - `ENCRYPT`:
   Encrypt data with the user's keyfile

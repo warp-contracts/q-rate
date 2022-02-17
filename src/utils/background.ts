@@ -6,9 +6,9 @@ import { PermissionType } from "./permissions";
 import { JWKInterface } from "arweave/node/lib/wallet";
 import { getRealURL } from "./url";
 import { browser } from "webextension-polyfill-ts";
-import { DataItem } from "arbundles";
+import type { DataItem } from "arbundles";
 import { run } from "ar-gql";
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import limestone from "@limestonefi/api";
 import Arweave from "arweave";
 
@@ -338,8 +338,7 @@ export async function getActiveKeyfile() {
 }
 
 export interface DispatchResult {
-  status: "OK" | "INSUFFICIENT_FUNDS" | "ERROR";
-  message?: string; // id for now
+  id: string;
   type?: "BASE" | "BUNDLED";
 }
 
@@ -348,7 +347,7 @@ export function generateBundlrAnchor() {
   // we can do this, because we know that the randomBytes buffer
   // will be 32 bytes of length
   // for larger buffers, String.fromCharCode should not be used
-  const base64str = btoa(String.fromCharCode(...randomBytes));
+  const base64str = btoa(String.fromCharCode(...randomBytes)).slice(0, 32);
 
   return base64str;
 }
@@ -361,11 +360,12 @@ export function generateBundlrAnchor() {
  */
 export async function uploadDataToBundlr(dataItem: DataItem) {
   const res = await axios.post(
-    "https://node1.bundlr.network/tx/arweave",
+    "https://node2.bundlr.network/tx",
     dataItem.getRaw(),
     {
-      headers: { "Content-Type": "application/octet-stream" },
-      timeout: 20000,
+      headers: {
+        "Content-Type": "application/octet-stream"
+      },
       maxBodyLength: Infinity
     }
   );
