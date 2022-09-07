@@ -12,7 +12,6 @@ import {
 import { JWKInterface } from "arweave/node/lib/wallet";
 import { VerifiedIcon } from "@primer/octicons-react";
 import Arweave from "arweave";
-import axios from "axios";
 import WalletManager from "../../../components/WalletManager";
 import styles from "../../../styles/views/Popup/send.module.sass";
 import fakeNews, {
@@ -47,7 +46,12 @@ export default function FakeReporting({
     currentWallet = wallets.find(({ address }) => address === profile),
     [tabUrl, setTabUrl] = useState<string | undefined>("https://google.com"),
     [dsptBalance, setDsptBalance] = useState(0),
-    [loading, setLoading] = useState({ disputes: true, balance: true }),
+    [loading, setLoading] = useState({
+      disputes: true,
+      balance: true,
+      report: false,
+      vote: []
+    }),
     [, setToast] = useToasts(),
     [verified] = useState<{
       verified: boolean;
@@ -157,6 +161,7 @@ export default function FakeReporting({
         return;
       }
 
+      setLoading((val) => ({ ...val, report: true }));
       await fakeNews.reportPageAsFake(
         tabUrl,
         contract,
@@ -166,6 +171,7 @@ export default function FakeReporting({
 
       await fetchContractDisputes();
       setWaitingForConfirmation(false);
+      setLoading((val) => ({ ...val, report: false }));
     } else {
       setWaitingForConfirmation(true);
     }
@@ -190,7 +196,7 @@ export default function FakeReporting({
     if (voted) {
       return;
     }
-    if (!dsptStakeAmount || !expirationBlock) {
+    if (!dsptStakeAmountState || !expirationBlock) {
       setToast({
         type: "error",
         text: "You need to enter all required values"
@@ -202,6 +208,13 @@ export default function FakeReporting({
       setToast({ type: "error", text: "You need to mint some tokens first!" });
       return;
     }
+    setLoading((val) => ({
+      ...val,
+      vote: {
+        ...value,
+        [2 * disputeIdx + selectedOptionIndex]: true
+      }
+    }));
     const url = contractDisputes[disputeIdx].key;
     await fakeNews.vote(
       url,
@@ -211,7 +224,17 @@ export default function FakeReporting({
     );
 
     await fetchContractDisputes();
-    dsptStakeAmount.reset();
+    setValue({
+      ...value,
+      [2 * disputeIdx + selectedOptionIndex]: ""
+    });
+    setLoading((val) => ({
+      ...val,
+      vote: {
+        ...value,
+        [2 * disputeIdx + selectedOptionIndex]: false
+      }
+    }));
   }
 
   async function buttonClickedInWithdrawRewardsSection(disputeIdx: number) {
@@ -271,13 +294,8 @@ export default function FakeReporting({
   };
 
   const getVotesSum = (votes: object): number => {
-    const sum = Object.values(votes).reduce(
-      (a, c) =>
-        fakeNews.getRoundedTokens(a, divisibility) +
-        fakeNews.getRoundedTokens(c, divisibility),
-      0
-    );
-    return sum;
+    const sum = [...Object.values(votes)].reduce((a, b) => a + b, 0);
+    return fakeNews.getRoundedTokens(sum, divisibility);
   };
 
   return (
@@ -345,23 +363,37 @@ export default function FakeReporting({
 
           {pageAlreadyReported && (
             <div
-              style={{
-                fontSize: "14px",
-                marginBottom: "10px",
-                textAlign: "center",
-                color: "grey",
-                textOverflow: "ellipsis",
-                overflow: "hidden",
-                whiteSpace: "nowrap",
-                maxWidth: "100%",
-                fontWeight: "bold"
-              }}
+              className="report-page-as-fake"
+              style={{ ...subSectionStyles, color: "gray" }}
             >
-              Page already reported, please join in the dispute below.
-              <br />
-              <a href={tabUrl} target="_blank">
-                {tabUrl}
-              </a>
+              <div
+                style={{
+                  fontSize: "14px",
+                  marginBottom: "10px",
+                  textAlign: "center",
+                  color: "grey",
+                  fontWeight: "bold"
+                }}
+              >
+                Page already reported, please join in the dispute below.
+              </div>
+              <div
+                style={{
+                  fontSize: "14px",
+                  marginBottom: "10px",
+                  textAlign: "center",
+                  color: "grey",
+                  textOverflow: "ellipsis",
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                  maxWidth: "100%",
+                  fontWeight: "bold"
+                }}
+              >
+                <a href={tabUrl} target="_blank">
+                  {tabUrl}
+                </a>
+              </div>
             </div>
           )}
           {!pageAlreadyReported && (
@@ -372,8 +404,19 @@ export default function FakeReporting({
               <div
                 style={{
                   fontSize: "14px",
+                  textAlign: "center",
+                  color: "grey",
+                  fontWeight: "bold"
+                }}
+              >
+                Do you want to report this page as fake?
+              </div>
+              <div
+                style={{
+                  fontSize: "14px",
                   marginBottom: "10px",
                   textAlign: "center",
+                  color: "grey",
                   textOverflow: "ellipsis",
                   overflow: "hidden",
                   whiteSpace: "nowrap",
@@ -381,8 +424,6 @@ export default function FakeReporting({
                   fontWeight: "bold"
                 }}
               >
-                Do you want to report this page as fake?
-                <br />
                 <a href={tabUrl} target="_blank">
                   {tabUrl}
                 </a>
@@ -413,6 +454,7 @@ export default function FakeReporting({
               <Button
                 style={{ width: "100%", marginBottom: "10px" }}
                 type="success"
+                loading={loading.report}
                 onClick={() =>
                   buttonClickedInFakeReportSection(
                     parseInt(dsptTokensAmount.state),
@@ -449,11 +491,14 @@ export default function FakeReporting({
                       textOverflow: "ellipsis",
                       overflow: "hidden",
                       whiteSpace: "nowrap",
-                      maxWidth: "100%",
-                      fontWeight: "bold"
+                      maxWidth: "100%"
                     }}
                   >
-                    <a href={dispute.key} target="_blank">
+                    <a
+                      href={dispute.key}
+                      target="_blank"
+                      style={{ fontWeight: "bold" }}
+                    >
                       {dispute.key}
                     </a>
                     {dispute.value.votes.map((v: VoteOption, idx: number) => (
@@ -467,7 +512,7 @@ export default function FakeReporting({
                               alignItems: "center",
                               marginBottom: "10px",
                               marginRight: "0.5rem",
-                              width: "20%"
+                              width: "30%"
                             }}
                           >
                             <span style={{ textTransform: "uppercase" }}>
@@ -500,6 +545,7 @@ export default function FakeReporting({
                           <Button
                             style={{
                               minWidth: "auto",
+                              width: "90px",
                               lineHeight: "inherit",
                               height: "calc(2.5 * 14px)",
                               marginBottom: "10px",
@@ -510,6 +556,11 @@ export default function FakeReporting({
                               dispute.value.expirationBlock -
                                 currentBlockHeight <=
                               0
+                            }
+                            loading={
+                              loading.vote[2 * disputeIdx + idx]
+                                ? loading.vote[2 * disputeIdx + idx]
+                                : false
                             }
                             onClick={() =>
                               buttonClickedInVoteSection(
