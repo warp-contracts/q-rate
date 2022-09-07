@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "mArker",
+  "name": "ArFact",
   "version": "0.0.3",
   "author": "Redstone Team <dev@redstone.finance>",
   "description": "Arweave fake news checker",
