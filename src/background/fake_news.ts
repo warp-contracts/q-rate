@@ -1,6 +1,4 @@
-import axios from "axios";
 import { Contract } from "warp-contracts";
-import { den, redstoneCache, fakeNewsContractId } from "../utils/constants";
 
 export interface ContractDispute {
   [id: string]: Dispute;
