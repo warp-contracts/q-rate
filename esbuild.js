@@ -18,6 +18,7 @@ esbuild
       "./src/scripts/background.ts",
       "./src/scripts/content.ts",
       "./src/scripts/injected.ts",
+      "./src/scripts/fake-news-content-script.ts",
       "./src/views/popup.tsx",
       "./src/views/auth.tsx",
       "./src/views/welcome.tsx",

@@ -472,7 +472,7 @@ export default function FakeReporting({
               </>
             )}
             {!loading.disputes && (
-              <Tabs initialValue="1" align="center">
+              <Tabs initialValue="1">
                 <Tabs.Item label="pending" value="1">
                   <FakeReportingList
                     contractDisputes={fakeNews.filterObject(

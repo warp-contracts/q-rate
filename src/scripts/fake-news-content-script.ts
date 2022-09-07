@@ -1,13 +1,25 @@
+import Arweave from "arweave";
+
+const arweave = Arweave.init({
+  host: "arweave.net",
+  port: 443,
+  protocol: "https"
+});
+
 async function checkTabForFakeNews() {
   const data = await getContractData();
   const disputes = data.state.disputes;
+  const currentHeight = await loadBlockHeight();
 
-  const fakeUrls = [];
-  const pendingUrls = [];
+  const fakeUrls: string[] = [];
+  const pendingUrls: string[] = [];
   Object.keys(disputes).forEach((d) => {
     if (disputes[d].winningOption == "fake") {
       fakeUrls.push(disputes[d].id);
-    } else if (disputes[d].winningOption == "") {
+    } else if (
+      disputes[d].expirationBlock > currentHeight &&
+      disputes[d].winningOption == ""
+    ) {
       pendingUrls.push(disputes[d].id);
     }
   });
@@ -24,7 +36,7 @@ async function checkTabForFakeNews() {
   }
 }
 
-function createWarningBox(isFake) {
+function createWarningBox(isFake: boolean) {
   let elemDiv = document.createElement("div");
   elemDiv.setAttribute("id", "warning");
   elemDiv.textContent = isFake
@@ -49,7 +61,7 @@ function createWarningBox(isFake) {
 }
 
 function removeWarning() {
-  document.getElementById("warning").remove();
+  document.getElementById("warning")!.remove();
 }
 
 async function getContractData() {
@@ -62,4 +74,12 @@ async function getContractData() {
   return data;
 }
 
+async function loadBlockHeight() {
+  const info = await arweave.network.getInfo();
+  const currentHeight = info.height;
+  return currentHeight;
+}
+
 checkTabForFakeNews();
+
+export {};
