@@ -23,13 +23,13 @@ import fakeNews, {
   VoteOption
 } from "../../../background/fake_news";
 import { getActiveTab } from "../../../utils/background";
-import { Contract, SmartWeave } from "redstone-smartweave";
+import { Warp, Contract } from "warp-contracts";
 import FakeReportingList from "../../../components/FakeReportingList";
 import { fakeNewsContractId } from "../../../utils/constants";
 
 export interface FakeReporting {
   arweave: Arweave;
-  smartweave: SmartWeave;
+  smartweave: Warp;
   fakeContractTxId: string;
   addressKey: JWKInterface;
 }
@@ -113,6 +113,7 @@ export default function FakeReporting({
       return;
     } else {
       const { divisibility, disputes, balance } = await getState(
+        contract,
         currentWallet.address
       );
       setDivisibility(divisibility);
@@ -122,6 +123,8 @@ export default function FakeReporting({
       setLoading((val) => ({ ...val, balance: false }));
     }
   }
+
+  async function buttonClickedInMintSection() {}
 
   async function buttonClickedInFakeReportSection(
     dsptTokensAmount: number,
@@ -363,7 +366,15 @@ export default function FakeReporting({
                 </>
               )}
             </h2>
-            <div
+            <Button
+              style={{ width: "100%", marginBottom: "10px" }}
+              type="success"
+              loading={loading.report}
+              onClick={() => buttonClickedInMintSection()}
+            >
+              {"Mint"}
+            </Button>
+            {/* <div
               style={{
                 textAlign: "center",
                 color: "#777",
@@ -375,7 +386,7 @@ export default function FakeReporting({
             >
               If you'd like to mint some tokens, please contact us on{" "}
               <a href="https://discord.com/invite/PVxBZKFr46">discord.</a>
-            </div>
+            </div> */}
             <div
               style={{
                 fontSize: "14px",

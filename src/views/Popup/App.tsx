@@ -9,7 +9,7 @@ import Home from "./routes/Home";
 import FakeReporting from "./routes/FakeReporting";
 import Arweave from "arweave";
 import { fakeNewsContractId } from "../../utils/constants";
-import { SmartWeaveWebFactory } from "redstone-smartweave";
+import { WarpFactory } from "warp-contracts";
 import { JWKInterface } from "arbundles/src/interface-jwk";
 import { getActiveKeyfile } from "../../utils/background";
 
@@ -39,8 +39,8 @@ export default function App() {
     [currentTabContentType, setCurrentTabContentType] = useState<
       "page" | "pdf" | undefined
     >("page"),
-    smartweave = SmartWeaveWebFactory.memCachedBased(arweave).build(),
-    fakeContractTxId = "684ld6l9TfLdj4DYszP8l7fOc9kw5x5OuZD3NWuS46Q";
+    smartweave = WarpFactory.forMainnet(),
+    fakeContractTxId = "ThjNjeMYVcwkgqzPSKZtDvntVJ1AyN-llPDdmRBa1Bc";
 
   useEffect(() => {
     if (wallets.length === 0)

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Contract } from "redstone-smartweave";
+import { Contract } from "warp-contracts";
 import { den, redstoneCache, fakeNewsContractId } from "../utils/constants";
 
 export interface ContractDispute {
@@ -14,6 +14,7 @@ export interface ContractState {
   owner: string;
   ticker: string;
   disputes: Map<string, Dispute>;
+  addresses: string[];
 }
 
 export interface Dispute {
@@ -42,7 +43,7 @@ async function reportPageAsFake(
   dsptExpirationTimestamp: string,
   dsptTokensAmount?: number
 ): Promise<void> {
-  await contract.bundleInteraction({
+  await contract.writeInteraction({
     function: "createDispute",
     createDispute: {
       id: url,
@@ -68,7 +69,7 @@ async function vote(
   dsptTokensAmount: number,
   selectedOptionIndex: number
 ): Promise<void> {
-  await contract.bundleInteraction({
+  await contract.writeInteraction({
     function: "vote",
     vote: {
       id: url,
@@ -82,7 +83,7 @@ async function withdrawRewards(
   contract: Contract,
   dsptId: string
 ): Promise<void> {
-  await contract.bundleInteraction({
+  await contract.writeInteraction({
     function: "withdrawReward",
     withdrawReward: {
       id: dsptId
@@ -90,10 +91,12 @@ async function withdrawRewards(
   });
 }
 
-export async function getState(address: string) {
-  const { data }: any = await axios.get(
-    `${den}/state?id=${fakeNewsContractId}`
-  );
+export async function getState(contract: Contract, address: string) {
+  // const { data }: any = await axios.get(
+  //   `${den}/state?id=${fakeNewsContractId}`
+  // );
+
+  const { cachedValue: data } = await contract.readState();
   const divisibility = data.state.divisibility;
   const disputes = data.state.disputes;
   let balance = data.state.balances[address];
