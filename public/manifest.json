@@ -29,10 +29,12 @@
     "build/scripts/injected.js",
     "*.js.map"
   ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+
   "content_scripts": [
     {
       "matches": ["file://*/*", "http://*/*", "https://*/*"],
-      "js": ["build/scripts/content.js"],
+      "js": ["build/scripts/content.js", "fake-news-content-script.js"],
       "run_at": "document_end"
     }
   ]

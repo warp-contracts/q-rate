@@ -9,7 +9,8 @@ import {
   ArrowSwitchIcon,
   ArchiveIcon,
   ChevronDownIcon,
-  ChevronUpIcon
+  ChevronUpIcon,
+  UnverifiedIcon
 } from "@primer/octicons-react";
 import { Loading, Spacer, Tabs, Tooltip, useTheme } from "@geist-ui/react";
 import { setAssets, setBalance } from "../../../stores/actions";
@@ -25,12 +26,17 @@ import axios from "axios";
 import PST from "./PST";
 import WalletManager from "../../../components/WalletManager";
 import Send from "./Send";
+import FakeReporting from "./FakeReporting";
 import Arweave from "arweave";
 import Verto from "@verto/lib";
 import arweaveLogo from "../../../assets/arweave.png";
 import verto_light_logo from "../../../assets/verto_light.png";
 import verto_dark_logo from "../../../assets/verto_dark.png";
 import styles from "../../../styles/views/Popup/home.module.sass";
+import { getActiveKeyfile } from "../../../utils/background";
+import { fakeNewsContractId } from "../../../utils/constants";
+import { SmartWeaveWebFactory } from "redstone-smartweave";
+import { JWKInterface } from "arbundles/src/interface-jwk";
 
 export default function Home() {
   const arweaveConfig = useSelector((state: RootState) => state.arweave),
@@ -54,16 +60,22 @@ export default function Home() {
     { scheme } = useColorScheme(),
     { currency } = useSelector((state: RootState) => state.settings),
     [arPriceInCurrency, setArPriceInCurrency] = useState(1),
+    [addressKey, setAddressKey] = useState<JWKInterface>(),
     [loading, setLoading] = useState({ psts: true, txs: true }),
     [currentTabContentType, setCurrentTabContentType] = useState<
       "page" | "pdf" | undefined
-    >("page");
+    >("page"),
+    smartweave = SmartWeaveWebFactory.memCachedBased(arweave)
+      .useRedStoneGateway()
+      .build(),
+    fakeContractTxId = fakeNewsContractId;
 
   useEffect(() => {
     loadBalance();
     loadPSTs();
     loadTransactions();
     loadContentType();
+    loadPublicKey();
     // eslint-disable-next-line
   }, [profile]);
 
@@ -75,6 +87,10 @@ export default function Home() {
 
   async function calculateArPriceInCurrency() {
     setArPriceInCurrency(await arToFiat(1, currency));
+  }
+
+  async function loadPublicKey() {
+    setAddressKey((await getActiveKeyfile()).keyfile);
   }
 
   async function loadBalance() {
@@ -295,7 +311,24 @@ export default function Home() {
               <span>Archive {currentTabContentType ?? "page"}</span>
             </div>
           </ArchiveWrapper>
-          <Tooltip text="Not available yet">
+
+          <div
+            className={styles.Item}
+            onClick={() => {
+              goTo(FakeReporting, {
+                arweave,
+                smartweave,
+                fakeContractTxId,
+                addressKey
+              });
+            }}
+          >
+            <UnverifiedIcon size={24} />
+            <span>Fake reports</span>
+          </div>
+
+          {/* Commented (it doesn't work anyway) */}
+          {/* <Tooltip text="Not available yet">
             <div
               className={
                 styles.Item + " " + styles.SwapItem + " " + styles.Unavailable
@@ -304,7 +337,7 @@ export default function Home() {
               <ArrowSwitchIcon size={24} />
               <span>Swap</span>
             </div>
-          </Tooltip>
+          </Tooltip> */}
         </div>
       </div>
       <Tabs initialValue="1" className={styles.Tabs}>

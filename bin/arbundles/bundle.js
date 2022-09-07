@@ -2609,7 +2609,11 @@ var t = {
       (o.default.crypto = new a.default()),
         (o.default.init = function (t = {}) {
           const e = (function () {
-              const t = { host: "arweave.net", port: 443, protocol: "https" };
+              const t = {
+                host: "arweave.net",
+                port: 443,
+                protocol: "https"
+              };
               if (
                 !(
                   window &&

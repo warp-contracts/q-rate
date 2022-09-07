@@ -8,6 +8,8 @@ import { createContextMenus } from "./context_menus";
 import { updateIcon } from "./icon";
 import { Tab } from "../stores/reducers/time_tracking";
 import { Tabs } from "webextension-polyfill-ts";
+import fakeNews from "./fake_news";
+import axios from "axios";
 
 async function loadData(): Promise<Tab[]> {
   try {
