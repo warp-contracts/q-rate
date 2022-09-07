@@ -17,11 +17,11 @@ import WalletManager from "../../../components/WalletManager";
 import styles from "../../../styles/views/Popup/send.module.sass";
 import fakeNews, {
   ContractState,
+  getDisputes,
   VoteOption
 } from "../../../background/fake_news";
 import { getActiveTab } from "../../../utils/background";
 import { Contract, SmartWeave } from "redstone-smartweave";
-import { redstoneCache, fakeNewsContractId } from "../../../utils/constants";
 
 export interface FakeReporting {
   arweave: Arweave;
@@ -101,11 +101,7 @@ export default function FakeReporting({
   }
 
   async function fetchContractDisputes() {
-    const { data }: any = await axios.get(
-      `${redstoneCache}/cache/state/${fakeNewsContractId}`
-    );
-    const divisibility = data.state.divisibility;
-    const disputes = new Map(Object.entries(data.state.disputes));
+    const { divisibility, disputes } = await getDisputes(contract);
 
     setDivisibility(divisibility);
 
@@ -126,7 +122,8 @@ export default function FakeReporting({
     } else {
       const loadedDsptBalance = await fakeNews.getBalance(
         currentWallet.address,
-        divisibility
+        divisibility,
+        contract
       );
       setDsptBalance(loadedDsptBalance);
       setLoading((val) => ({ ...val, balance: false }));

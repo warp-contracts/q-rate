@@ -1,6 +1,4 @@
-import axios from "axios";
 import { Contract } from "redstone-smartweave";
-import { fakeNewsContractId, redstoneCache } from "../utils/constants";
 
 export interface ContractState {
   balances: Map<string, number>;
@@ -85,16 +83,22 @@ async function withdrawRewards(
 
 async function getBalance(
   address: string,
-  divisibility: number
+  divisibility: number,
+  contract: Contract
 ): Promise<number> {
-  const { data }: any = await axios.get(
-    `${redstoneCache}/cache/state/${fakeNewsContractId}`
-  );
-  const balance = data.state.balances[address];
+  const { state }: any = await contract.readState();
+  const balance = state.balances[address];
   if (!balance) {
     return 0;
   }
   return getRoundedTokens(balance, divisibility);
+}
+
+export async function getDisputes(contract: Contract) {
+  const { state }: any = await contract.readState();
+  const divisibility = state.divisibility;
+  const disputes = new Map(Object.entries(state.disputes));
+  return { divisibility, disputes };
 }
 
 export function getRoundedTokens(amount: number, divisibility: number): number {
@@ -114,5 +118,6 @@ export default {
   vote,
   withdrawRewards,
   getRoundedTokens,
-  postMultipliedTokens
+  postMultipliedTokens,
+  getDisputes
 };
