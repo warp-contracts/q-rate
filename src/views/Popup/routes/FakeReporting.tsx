@@ -41,7 +41,6 @@ export default function FakeReporting({
 }: FakeReporting) {
   const dsptTokenSymbol = "TRUTH",
     dsptTokensAmount = useInput(""),
-    expirationBlock = useInput(""),
     [waitingForConfirmation, setWaitingForConfirmation] = useState(false),
     profile = useSelector((state: RootState) => state.profile),
     wallets = useSelector((state: RootState) => state.wallets),
@@ -126,22 +125,12 @@ export default function FakeReporting({
     }
   }
 
-  async function buttonClickedInFakeReportSection(
-    dsptTokensAmount: number,
-    expirationBlock: number
-  ) {
+  async function buttonClickedInFakeReportSection(dsptTokensAmount: number) {
     if (waitingForConfirmation) {
       if (dsptBalance < dsptTokensAmount) {
         setToast({
           type: "error",
           text: "You need to mint some tokens first!"
-        });
-        return;
-      }
-      if (!expirationBlock) {
-        setToast({
-          type: "error",
-          text: "You need to type in expiration block"
         });
         return;
       }
@@ -157,7 +146,6 @@ export default function FakeReporting({
       await fakeNews.reportPageAsFake(
         tabUrl,
         contract,
-        expirationBlock,
         fakeNews.postMultipliedTokens(dsptTokensAmount, divisibility)
       );
 
@@ -193,10 +181,10 @@ export default function FakeReporting({
       });
       return;
     }
-    if (!dsptStakeAmountState || !expirationBlock) {
+    if (!dsptStakeAmountState) {
       setToast({
         type: "error",
-        text: "You need to enter all required values"
+        text: "You need to enter stake amount."
       });
       return;
     }
@@ -455,14 +443,6 @@ export default function FakeReporting({
                       min="0"
                     />
                   </div>
-                  <div style={{ marginBottom: "10px" }}>
-                    <Input
-                      {...expirationBlock.bindings}
-                      placeholder={`Expiration blocks`}
-                      htmlType="number"
-                      min="0"
-                    />
-                  </div>
                 </>
               )}
 
@@ -472,8 +452,7 @@ export default function FakeReporting({
                 loading={loading.report}
                 onClick={() =>
                   buttonClickedInFakeReportSection(
-                    parseInt(dsptTokensAmount.state),
-                    parseInt(expirationBlock.state)
+                    parseInt(dsptTokensAmount.state)
                   )
                 }
               >
@@ -493,7 +472,7 @@ export default function FakeReporting({
               </>
             )}
             {!loading.disputes && (
-              <Tabs initialValue="1">
+              <Tabs initialValue="1" align="center">
                 <Tabs.Item label="pending" value="1">
                   <FakeReportingList
                     contractDisputes={fakeNews.filterObject(

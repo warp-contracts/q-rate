@@ -33,10 +33,12 @@ export interface VoteOption {
   votes: Map<string, number>;
 }
 
+// aproximately one day
+const EXPIRATION_BLOCK = 720;
+
 async function reportPageAsFake(
   url: string,
   contract: Contract,
-  expBlock: number,
   dsptTokensAmount?: number
 ): Promise<void> {
   await contract.bundleInteraction({
@@ -46,7 +48,7 @@ async function reportPageAsFake(
       title: url,
       description: url,
       options: ["fake", "legit"],
-      expirationBlocks: expBlock,
+      expirationBlocks: EXPIRATION_BLOCK,
       ...(dsptTokensAmount
         ? {
             initialStakeAmount: {
