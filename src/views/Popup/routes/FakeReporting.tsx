@@ -284,7 +284,7 @@ export default function FakeReporting({
     await loadDsptBalance(divisibility);
     setToast({
       type: "success",
-      text: `Your reward is: ${contractDisputes[disputeIdx].value.withdrawableAmounts[profile]}`
+      text: `Your reward has been withdrawn.`
     });
   }
 
