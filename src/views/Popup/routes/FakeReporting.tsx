@@ -392,8 +392,9 @@ export default function FakeReporting({
               )}
             </h2>
             <Button
-              style={{ width: "100%", marginBottom: "10px" }}
+              style={{ width: "20%", marginBottom: "10px" }}
               type="success"
+              ghost
               loading={loading.mint}
               onClick={() => buttonClickedInMintSection()}
             >
