@@ -1,5 +1,10 @@
+import axios from "axios";
 import { Contract } from "redstone-smartweave";
+import { den, fakeNewsContractId } from "../utils/constants";
 
+export interface ContractDispute {
+  [id: string]: Dispute;
+}
 export interface ContractState {
   balances: Map<string, number>;
   divisibility: number;
@@ -18,8 +23,9 @@ export interface Dispute {
   options: string[];
   votes: VoteOption[];
   expirationBlock: number;
-  withdrawableAmounts: Map<string, number>;
+  withdrawableAmounts: any;
   calculated: boolean;
+  winningOption: string;
 }
 
 export interface VoteOption {
@@ -81,24 +87,19 @@ async function withdrawRewards(
   });
 }
 
-async function getBalance(
-  address: string,
-  divisibility: number,
-  contract: Contract
-): Promise<number> {
-  const { state }: any = await contract.readState();
-  const balance = state.balances[address];
+export async function getState(address: string) {
+  const { data }: any = await axios.get(
+    `${den}/state?id=${fakeNewsContractId}`
+  );
+  const divisibility = data.state.divisibility;
+  const disputes = data.state.disputes;
+  let balance = data.state.balances[address];
   if (!balance) {
-    return 0;
+    balance = 0;
+  } else {
+    balance = getRoundedTokens(balance, divisibility);
   }
-  return getRoundedTokens(balance, divisibility);
-}
-
-export async function getDisputes(contract: Contract) {
-  const { state }: any = await contract.readState();
-  const divisibility = state.divisibility;
-  const disputes = new Map(Object.entries(state.disputes));
-  return { divisibility, disputes };
+  return { divisibility, disputes, balance };
 }
 
 export function getRoundedTokens(amount: number, divisibility: number): number {
@@ -112,12 +113,23 @@ export function postMultipliedTokens(
   return amount * divisibility;
 }
 
+export function getVotesSum(votes: object, divisibility: number): number {
+  const sum = [...Object.values(votes)].reduce((a, b) => a + b, 0);
+  return getRoundedTokens(sum, divisibility);
+}
+
+export const filterObject = (obj: any, predicate: any) =>
+  Object.keys(obj)
+    .filter((key) => predicate(obj[key]))
+    .reduce((res: any, key) => ((res[key] = obj[key]), res), {});
+
 export default {
   reportPageAsFake,
-  getBalance,
   vote,
   withdrawRewards,
   getRoundedTokens,
   postMultipliedTokens,
-  getDisputes
+  getState,
+  getVotesSum,
+  filterObject
 };

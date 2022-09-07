@@ -6,6 +6,7 @@ import {
   Input,
   Loading,
   Spacer,
+  Tabs,
   useInput,
   useToasts
 } from "@geist-ui/react";
@@ -15,18 +16,20 @@ import Arweave from "arweave";
 import WalletManager from "../../../components/WalletManager";
 import styles from "../../../styles/views/Popup/send.module.sass";
 import fakeNews, {
+  ContractDispute,
   ContractState,
-  getDisputes,
+  Dispute,
+  getState,
   VoteOption
 } from "../../../background/fake_news";
 import { getActiveTab } from "../../../utils/background";
 import { Contract, SmartWeave } from "redstone-smartweave";
+import FakeReportingList from "../../../components/FakeReportingList";
 
 export interface FakeReporting {
   arweave: Arweave;
   smartweave: SmartWeave;
   fakeContractTxId: string;
-  contract: Contract;
   addressKey: JWKInterface;
 }
 
@@ -39,7 +42,6 @@ export default function FakeReporting({
   const dsptTokenSymbol = "TRUTH",
     dsptTokensAmount = useInput(""),
     expirationBlock = useInput(""),
-    dsptStakeAmount = useInput(""),
     [waitingForConfirmation, setWaitingForConfirmation] = useState(false),
     profile = useSelector((state: RootState) => state.profile),
     wallets = useSelector((state: RootState) => state.wallets),
@@ -50,7 +52,8 @@ export default function FakeReporting({
       disputes: true,
       balance: true,
       report: false,
-      vote: []
+      vote: [],
+      withdraw: []
     }),
     [, setToast] = useToasts(),
     [verified] = useState<{
@@ -61,9 +64,7 @@ export default function FakeReporting({
     contract: Contract<ContractState> = smartweave
       .contract<ContractState>(fakeContractTxId)
       .connect(addressKey),
-    [contractDisputes, setContractDisputes] = useState<
-      { key: string; value: any }[]
-    >([]),
+    [contractDisputes, setContractDisputes] = useState<ContractDispute>({}),
     [pageAlreadyReported, setPageAlreadyReported] = useState<boolean>(false),
     [divisibility, setDivisibility] = useState<number>(0),
     [value, setValue] = useState<any>({}),
@@ -83,11 +84,13 @@ export default function FakeReporting({
   }, [profile]);
 
   useEffect(() => {
-    setPageAlreadyReported(
-      contractDisputes.some(
-        (r: { key: string; value: object }) => r.key === tabUrl
-      )
-    );
+    if (contractDisputes) {
+      setPageAlreadyReported(
+        Object.keys(contractDisputes).some(
+          (r: string) => contractDisputes[r].id === tabUrl
+        )
+      );
+    }
   }, [tabUrl, contractDisputes]);
 
   async function loadActiveTab() {
@@ -105,18 +108,6 @@ export default function FakeReporting({
   }
 
   async function fetchContractDisputes() {
-    const { divisibility, disputes } = await getDisputes(contract);
-
-    setDivisibility(divisibility);
-
-    setContractDisputes(
-      Array.from(disputes, ([key, value]) => ({ key, value }))
-    );
-    setLoading((val) => ({ ...val, disputes: false }));
-    await loadDsptBalance(divisibility);
-  }
-
-  async function loadDsptBalance(divisibility: number) {
     if (!currentWallet) {
       setToast({
         type: "error",
@@ -124,12 +115,13 @@ export default function FakeReporting({
       });
       return;
     } else {
-      const loadedDsptBalance = await fakeNews.getBalance(
-        currentWallet.address,
-        divisibility,
-        contract
+      const { divisibility, disputes, balance } = await getState(
+        currentWallet.address
       );
-      setDsptBalance(loadedDsptBalance);
+      setDivisibility(divisibility);
+      setContractDisputes(disputes);
+      setLoading((val) => ({ ...val, disputes: false }));
+      setDsptBalance(balance);
       setLoading((val) => ({ ...val, balance: false }));
     }
   }
@@ -179,11 +171,12 @@ export default function FakeReporting({
 
   async function buttonClickedInVoteSection(
     disputeIdx: number,
+    dispute: string,
     dsptStakeAmountState: number,
     selectedOptionIndex: number
   ) {
     let voted: boolean = false;
-    contractDisputes[disputeIdx].value.votes.forEach((v: VoteOption) => {
+    contractDisputes[dispute].votes.forEach((v: VoteOption) => {
       if (Object.keys(v.votes).includes(profile)) {
         setToast({
           type: "error",
@@ -194,6 +187,10 @@ export default function FakeReporting({
       }
     });
     if (voted) {
+      setValue({
+        ...value,
+        [2 * disputeIdx + selectedOptionIndex]: ""
+      });
       return;
     }
     if (!dsptStakeAmountState || !expirationBlock) {
@@ -206,6 +203,10 @@ export default function FakeReporting({
 
     if (dsptBalance < dsptStakeAmountState) {
       setToast({ type: "error", text: "You need to mint some tokens first!" });
+      setValue({
+        ...value,
+        [2 * disputeIdx + selectedOptionIndex]: ""
+      });
       return;
     }
     setLoading((val) => ({
@@ -215,7 +216,7 @@ export default function FakeReporting({
         [2 * disputeIdx + selectedOptionIndex]: true
       }
     }));
-    const url = contractDisputes[disputeIdx].key;
+    const url = contractDisputes[dispute].id;
     await fakeNews.vote(
       url,
       contract,
@@ -237,9 +238,12 @@ export default function FakeReporting({
     }));
   }
 
-  async function buttonClickedInWithdrawRewardsSection(disputeIdx: number) {
+  async function buttonClickedInWithdrawRewardsSection(
+    dispute: string,
+    disputeIdx: number
+  ) {
     let voted: number = 0;
-    contractDisputes[disputeIdx].value.votes.forEach((v: VoteOption) => {
+    contractDisputes[dispute].votes.forEach((v: VoteOption) => {
       if (Object.keys(v.votes).includes(profile)) {
         voted++;
         return;
@@ -254,10 +258,8 @@ export default function FakeReporting({
     }
 
     if (
-      contractDisputes[disputeIdx].value.calculated &&
-      !contractDisputes[disputeIdx].value.withdrawableAmounts.hasOwnProperty(
-        profile
-      )
+      contractDisputes[dispute].calculated &&
+      !contractDisputes[dispute].withdrawableAmounts.hasOwnProperty(profile)
     ) {
       setToast({
         type: "error",
@@ -266,10 +268,8 @@ export default function FakeReporting({
       return;
     }
     if (
-      contractDisputes[disputeIdx].value.withdrawableAmounts.hasOwnProperty(
-        profile
-      ) &&
-      contractDisputes[disputeIdx].value.withdrawableAmounts[profile] == 0
+      contractDisputes[dispute].withdrawableAmounts.hasOwnProperty(profile) &&
+      contractDisputes[dispute].withdrawableAmounts[profile] == 0
     ) {
       setToast({
         type: "error",
@@ -277,25 +277,40 @@ export default function FakeReporting({
       });
       return;
     }
-    const disputeId = contractDisputes[disputeIdx].key;
+    setLoading((val) => ({
+      ...val,
+      withdraw: {
+        ...value,
+        [disputeIdx]: true
+      }
+    }));
+    const disputeId = contractDisputes[dispute].id;
     await fakeNews.withdrawRewards(contract, disputeId);
 
     await fetchContractDisputes();
-    await loadDsptBalance(divisibility);
     setToast({
       type: "success",
       text: `Your reward has been withdrawn.`
     });
+
+    setLoading((val) => ({
+      ...val,
+      withdraw: {
+        ...value,
+        [disputeIdx]: false
+      }
+    }));
   }
 
+  const countVotesSumForLabel = (dispute: Dispute, label: string) => {
+    return fakeNews.getVotesSum(
+      dispute.votes.find((v: VoteOption) => v.label == label)!.votes,
+      divisibility
+    );
+  };
   const subSectionStyles = {
     borderBottom: "1px solid #ddd",
     marginBottom: "10px"
-  };
-
-  const getVotesSum = (votes: object): number => {
-    const sum = [...Object.values(votes)].reduce((a, b) => a + b, 0);
-    return fakeNews.getRoundedTokens(sum, divisibility);
   };
 
   return (
@@ -348,7 +363,7 @@ export default function FakeReporting({
                 color: "gray"
               }}
             >
-              Check out contract in
+              Verify contract in
               <a
                 style={{ paddingLeft: "0.25rem" }}
                 href={
@@ -477,140 +492,71 @@ export default function FakeReporting({
                 <Spacer h={1.25} />
               </>
             )}
-            {contractDisputes &&
-              contractDisputes.map(
-                (dispute: { key: string; value: any }, disputeIdx: number) => (
-                  <div
-                    style={{
-                      padding: "10px",
-                      borderRadius: "5px",
-                      marginBottom: "10px",
-                      color: "gray",
-                      fontSize: "14px",
-                      border: "1px solid #a99eec",
-                      textOverflow: "ellipsis",
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
-                      maxWidth: "100%"
-                    }}
-                  >
-                    <a
-                      href={dispute.key}
-                      target="_blank"
-                      style={{ fontWeight: "bold" }}
-                    >
-                      {dispute.key}
-                    </a>
-                    {dispute.value.votes.map((v: VoteOption, idx: number) => (
-                      <div>
-                        <hr />
-
-                        <div style={{ display: "flex" }}>
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              marginBottom: "10px",
-                              marginRight: "0.5rem",
-                              width: "30%"
-                            }}
-                          >
-                            <span style={{ textTransform: "uppercase" }}>
-                              {v.label}
-                            </span>
-                            :{" "}
-                            <strong style={{ marginLeft: "0.25rem" }}>
-                              {getVotesSum(v.votes)}
-                            </strong>
-                            <br />
-                          </div>
-                          {
-                            <>
-                              <div style={{ marginBottom: "10px" }}>
-                                <Input
-                                  value={
-                                    value[2 * disputeIdx + idx]
-                                      ? value[2 * disputeIdx + idx]
-                                      : ""
-                                  }
-                                  onChange={(e) => handler(e, disputeIdx, idx)}
-                                  placeholder={`Amount`}
-                                  labelRight={dsptTokenSymbol}
-                                  htmlType="number"
-                                  min="0"
-                                />
-                              </div>
-                            </>
-                          }
-                          <Button
-                            style={{
-                              minWidth: "auto",
-                              width: "90px",
-                              lineHeight: "inherit",
-                              height: "calc(2.5 * 14px)",
-                              marginBottom: "10px",
-                              marginLeft: "0.5rem"
-                            }}
-                            type="success"
-                            disabled={
-                              dispute.value.expirationBlock -
-                                currentBlockHeight <=
-                              0
-                            }
-                            loading={
-                              loading.vote[2 * disputeIdx + idx]
-                                ? loading.vote[2 * disputeIdx + idx]
-                                : false
-                            }
-                            onClick={() =>
-                              buttonClickedInVoteSection(
-                                disputeIdx,
-                                parseInt(value[2 * disputeIdx + idx]),
-                                idx
-                              )
-                            }
-                          >
-                            Vote
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between"
-                      }}
-                    >
-                      <div style={{ alignItems: "center", display: "flex" }}>
-                        <span>Blocks till withdraw: </span>
-                        <strong style={{ marginLeft: "0.25rem" }}>
-                          {dispute.value.expirationBlock - currentBlockHeight <
-                          0
-                            ? 0
-                            : dispute.value.expirationBlock -
-                              currentBlockHeight}
-                        </strong>
-                      </div>
-
-                      {
-                        <Button
-                          style={{ minWidth: "auto", marginBottom: "10px" }}
-                          type="success"
-                          disabled={
-                            dispute.value.expirationBlock - currentBlockHeight >
-                            0
-                          }
-                          onClick={() =>
-                            buttonClickedInWithdrawRewardsSection(disputeIdx)
-                          }
-                        >
-                          Withdraw
-                        </Button>
-                      }
-                    </div>
-                  </div>
-                )
-              )}
+            {!loading.disputes && (
+              <Tabs initialValue="1">
+                <Tabs.Item label="pending" value="1">
+                  <FakeReportingList
+                    contractDisputes={fakeNews.filterObject(
+                      contractDisputes,
+                      (dispute: Dispute) =>
+                        dispute.expirationBlock - currentBlockHeight > 0
+                    )}
+                    value={value}
+                    handler={handler}
+                    divisibility={divisibility}
+                    currentBlockHeight={currentBlockHeight}
+                    dsptTokenSymbol={dsptTokenSymbol}
+                    buttonClickedInVoteSection={buttonClickedInVoteSection}
+                    buttonClickedInWithdrawRewardsSection={
+                      buttonClickedInWithdrawRewardsSection
+                    }
+                    loading={loading}
+                  />
+                </Tabs.Item>
+                <Tabs.Item label="fake" value="2">
+                  <FakeReportingList
+                    contractDisputes={fakeNews.filterObject(
+                      contractDisputes,
+                      (dispute: Dispute) =>
+                        dispute.expirationBlock - currentBlockHeight <= 0 &&
+                        countVotesSumForLabel(dispute, "fake") >
+                          countVotesSumForLabel(dispute, "legit")
+                    )}
+                    value={value}
+                    handler={handler}
+                    divisibility={divisibility}
+                    currentBlockHeight={currentBlockHeight}
+                    dsptTokenSymbol={dsptTokenSymbol}
+                    buttonClickedInVoteSection={buttonClickedInVoteSection}
+                    buttonClickedInWithdrawRewardsSection={
+                      buttonClickedInWithdrawRewardsSection
+                    }
+                    loading={loading}
+                  />
+                </Tabs.Item>
+                <Tabs.Item label="legit" value="3">
+                  <FakeReportingList
+                    contractDisputes={fakeNews.filterObject(
+                      contractDisputes,
+                      (dispute: Dispute) =>
+                        dispute.expirationBlock - currentBlockHeight <= 0 &&
+                        countVotesSumForLabel(dispute, "fake") <=
+                          countVotesSumForLabel(dispute, "legit")
+                    )}
+                    value={value}
+                    handler={handler}
+                    divisibility={divisibility}
+                    currentBlockHeight={currentBlockHeight}
+                    dsptTokenSymbol={dsptTokenSymbol}
+                    buttonClickedInVoteSection={buttonClickedInVoteSection}
+                    buttonClickedInWithdrawRewardsSection={
+                      buttonClickedInWithdrawRewardsSection
+                    }
+                    loading={loading}
+                  />
+                </Tabs.Item>
+              </Tabs>
+            )}
           </div>
         </div>
       </div>
