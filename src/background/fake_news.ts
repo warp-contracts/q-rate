@@ -1,4 +1,6 @@
+import axios from "axios";
 import { Contract } from "warp-contracts";
+import { den, fakeNewsContractId } from "../utils/constants";
 
 export interface ContractDispute {
   [id: string]: Dispute;
@@ -90,11 +92,10 @@ async function withdrawRewards(
 }
 
 export async function getState(contract: Contract, address: string) {
-  // const { data }: any = await axios.get(
-  //   `${den}/state?id=${fakeNewsContractId}`
-  // );
+  const { data }: any = await axios.get(
+    `${den}/state?id=${fakeNewsContractId}&snowball=false`
+  );
 
-  const { cachedValue: data } = await contract.readState();
   const addresses = data.state.addresses;
   const divisibility = data.state.divisibility;
   const disputes = data.state.disputes;
