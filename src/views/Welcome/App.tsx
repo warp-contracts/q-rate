@@ -300,7 +300,7 @@ export default function App() {
             {(walletsStore.length === 0 && (
               <>
                 to <br />
-                <span style={{ color: theme.palette.success }}>Q-Rate</span>
+                <span style={{ color: theme.palette.success }}>QRate</span>
               </>
             )) ||
               "back! :)"}

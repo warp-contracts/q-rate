@@ -1,1 +1,1 @@
-# Q-Rate
+# QRate
