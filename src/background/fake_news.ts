@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Contract } from "redstone-smartweave";
-import { den, fakeNewsContractId } from "../utils/constants";
+import { den, redstoneCache, fakeNewsContractId } from "../utils/constants";
 
 export interface ContractDispute {
   [id: string]: Dispute;
@@ -22,7 +22,7 @@ export interface Dispute {
   description: string;
   options: string[];
   votes: VoteOption[];
-  expirationBlock: number;
+  expirationTimestamp: number;
   withdrawableAmounts: any;
   calculated: boolean;
   winningOption: string;
@@ -39,6 +39,7 @@ const EXPIRATION_BLOCK = 720;
 async function reportPageAsFake(
   url: string,
   contract: Contract,
+  dsptExpirationTimestamp: string,
   dsptTokensAmount?: number
 ): Promise<void> {
   await contract.bundleInteraction({
@@ -48,11 +49,11 @@ async function reportPageAsFake(
       title: url,
       description: url,
       options: ["fake", "legit"],
-      expirationBlocks: EXPIRATION_BLOCK,
+      expirationTimestamp: dsptExpirationTimestamp,
       ...(dsptTokensAmount
         ? {
             initialStakeAmount: {
-              amount: dsptTokensAmount,
+              amount: dsptTokensAmount.toString(),
               optionIndex: 0
             }
           }
@@ -72,7 +73,7 @@ async function vote(
     vote: {
       id: url,
       selectedOptionIndex: selectedOptionIndex,
-      stakeAmount: dsptTokensAmount
+      stakeAmount: dsptTokensAmount.toString()
     }
   });
 }
@@ -116,8 +117,13 @@ export function postMultipliedTokens(
 }
 
 export function getVotesSum(votes: object, divisibility: number): number {
-  const sum = [...Object.values(votes)].reduce((a, b) => a + b, 0);
-  return getRoundedTokens(sum, divisibility);
+  let votesList: any[] = [];
+
+  for (const key in votes) {
+    votesList.push(parseInt(votes[key].quadraticAmount));
+  }
+  const sum = [...votesList].reduce((a, b) => a + b, 0);
+  return sum;
 }
 
 export const filterObject = (obj: any, predicate: any) =>

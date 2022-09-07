@@ -7,12 +7,12 @@ import { fixupPasswords } from "../utils/auth";
 import setupStores from "../stores";
 
 const themeCommon = {
-  success: "#AB9DF2",
-  successLight: "#c8bff2",
-  successDark: "#7f6aeb",
-  link: "#AB9DF2",
-  selection: "#AB9DF2",
-  code: "#F81CE5"
+  success: "#5982f1",
+  successLight: "#8ea1ed",
+  successDark: "#2f55f5",
+  link: "#5273fb",
+  selection: "#bcc8f5",
+  code: "#5982f1"
 };
 
 const lightTheme = Themes.createFromLight({

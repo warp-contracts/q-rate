@@ -25,6 +25,7 @@ import fakeNews, {
 import { getActiveTab } from "../../../utils/background";
 import { Contract, SmartWeave } from "redstone-smartweave";
 import FakeReportingList from "../../../components/FakeReportingList";
+import { fakeNewsContractId } from "../../../utils/constants";
 
 export interface FakeReporting {
   arweave: Arweave;
@@ -41,6 +42,9 @@ export default function FakeReporting({
 }: FakeReporting) {
   const dsptTokenSymbol = "TRUTH",
     dsptTokensAmount = useInput(""),
+    dsptExpirationTimestamp = useInput(
+      (Math.trunc(+Date.now() / 1000) + 86400).toString()
+    ),
     [waitingForConfirmation, setWaitingForConfirmation] = useState(false),
     profile = useSelector((state: RootState) => state.profile),
     wallets = useSelector((state: RootState) => state.wallets),
@@ -73,11 +77,11 @@ export default function FakeReporting({
         [2 * dsptIdx + idx]: e.target.value
       });
     },
-    [currentBlockHeight, setCurrentBlockHeight] = useState<number>(0);
+    [currentTimestamp, setCurrentTimestamp] = useState<number>(0);
 
   useEffect(() => {
     fetchContractDisputes();
-    loadBlockHeight();
+    setCurrentTimestamp(Math.trunc(+Date.now() / 1000));
     loadActiveTab();
     // eslint-disable-next-line
   }, [profile]);
@@ -100,12 +104,6 @@ export default function FakeReporting({
     setTabUrl(shortUrl);
   }
 
-  async function loadBlockHeight() {
-    const info = await arweave.network.getInfo();
-    const currentHeight = info.height;
-    setCurrentBlockHeight(currentHeight);
-  }
-
   async function fetchContractDisputes() {
     if (!currentWallet) {
       setToast({
@@ -125,12 +123,43 @@ export default function FakeReporting({
     }
   }
 
-  async function buttonClickedInFakeReportSection(dsptTokensAmount: number) {
+  async function buttonClickedInFakeReportSection(
+    dsptTokensAmount: number,
+    dsptExpirationTimestamp: string
+  ) {
+    if (
+      dsptExpirationTimestamp.length < 10 ||
+      dsptExpirationTimestamp.length > 13
+    ) {
+      setToast({
+        type: "error",
+        text: "Incorrect timestamp."
+      });
+      return;
+    }
+    let parsedExpirationTimestamp;
+
+    if (dsptExpirationTimestamp.length == 13) {
+      parsedExpirationTimestamp = Math.trunc(
+        parseInt(dsptExpirationTimestamp) / 1000
+      ).toString();
+    } else {
+      parsedExpirationTimestamp = dsptExpirationTimestamp;
+    }
     if (waitingForConfirmation) {
       if (dsptBalance < dsptTokensAmount) {
         setToast({
           type: "error",
           text: "You need to mint some tokens first!"
+        });
+        return;
+      }
+      if (
+        parseInt(parsedExpirationTimestamp) <= Math.trunc(+Date.now() / 1000)
+      ) {
+        setToast({
+          type: "error",
+          text: "Expiration timestamp should be set to future!"
         });
         return;
       }
@@ -146,6 +175,7 @@ export default function FakeReporting({
       await fakeNews.reportPageAsFake(
         tabUrl,
         contract,
+        parsedExpirationTimestamp,
         fakeNews.postMultipliedTokens(dsptTokensAmount, divisibility)
       );
 
@@ -354,12 +384,10 @@ export default function FakeReporting({
               Verify contract in
               <a
                 style={{ paddingLeft: "0.25rem" }}
-                href={
-                  "https://sonar.redstone.tools/#/app/contract/pvudp_Wp8NMDJR6KUsQbzJJ27oLO4fAKXsnVQn86JbU"
-                }
+                href={`https://sonar.redstone.tools/#/app/contract/${fakeNewsContractId}`}
                 target="_blank"
               >
-                SonAR
+                SonAR.
               </a>
             </div>
           </div>
@@ -443,6 +471,15 @@ export default function FakeReporting({
                       min="0"
                     />
                   </div>
+                  <div style={{ marginBottom: "10px" }}>
+                    <Input
+                      {...dsptExpirationTimestamp.bindings}
+                      placeholder={`Expiration timestamp`}
+                      labelRight={"Expiration timestamp"}
+                      htmlType="number"
+                      min="0"
+                    />
+                  </div>
                 </>
               )}
 
@@ -452,7 +489,8 @@ export default function FakeReporting({
                 loading={loading.report}
                 onClick={() =>
                   buttonClickedInFakeReportSection(
-                    parseInt(dsptTokensAmount.state)
+                    parseInt(dsptTokensAmount.state),
+                    dsptExpirationTimestamp.state
                   )
                 }
               >
@@ -478,12 +516,14 @@ export default function FakeReporting({
                     contractDisputes={fakeNews.filterObject(
                       contractDisputes,
                       (dispute: Dispute) =>
-                        dispute.expirationBlock - currentBlockHeight > 0
+                        dispute.expirationTimestamp - currentTimestamp > 0 &&
+                        dispute.description !=
+                          "https://www.nts.live/shows/moxie"
                     )}
                     value={value}
                     handler={handler}
                     divisibility={divisibility}
-                    currentBlockHeight={currentBlockHeight}
+                    currentTimestamp={currentTimestamp}
                     dsptTokenSymbol={dsptTokenSymbol}
                     buttonClickedInVoteSection={buttonClickedInVoteSection}
                     buttonClickedInWithdrawRewardsSection={
@@ -497,14 +537,14 @@ export default function FakeReporting({
                     contractDisputes={fakeNews.filterObject(
                       contractDisputes,
                       (dispute: Dispute) =>
-                        dispute.expirationBlock - currentBlockHeight <= 0 &&
+                        dispute.expirationTimestamp - currentTimestamp <= 0 &&
                         countVotesSumForLabel(dispute, "fake") >
                           countVotesSumForLabel(dispute, "legit")
                     )}
                     value={value}
                     handler={handler}
                     divisibility={divisibility}
-                    currentBlockHeight={currentBlockHeight}
+                    currentTimestamp={currentTimestamp}
                     dsptTokenSymbol={dsptTokenSymbol}
                     buttonClickedInVoteSection={buttonClickedInVoteSection}
                     buttonClickedInWithdrawRewardsSection={
@@ -518,14 +558,14 @@ export default function FakeReporting({
                     contractDisputes={fakeNews.filterObject(
                       contractDisputes,
                       (dispute: Dispute) =>
-                        dispute.expirationBlock - currentBlockHeight <= 0 &&
+                        dispute.expirationTimestamp - currentTimestamp <= 0 &&
                         countVotesSumForLabel(dispute, "fake") <=
                           countVotesSumForLabel(dispute, "legit")
                     )}
                     value={value}
                     handler={handler}
                     divisibility={divisibility}
-                    currentBlockHeight={currentBlockHeight}
+                    currentTimestamp={currentTimestamp}
                     dsptTokenSymbol={dsptTokenSymbol}
                     buttonClickedInVoteSection={buttonClickedInVoteSection}
                     buttonClickedInWithdrawRewardsSection={

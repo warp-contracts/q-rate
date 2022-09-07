@@ -1,28 +1,38 @@
-import Arweave from "arweave";
-
-const arweave = Arweave.init({
-  host: "arweave.net",
-  port: 443,
-  protocol: "https"
-});
-
 async function checkTabForFakeNews() {
   const data = await getContractData();
-  const disputes = data.state.disputes;
-  const currentHeight = await loadBlockHeight();
 
+  const disputes = data.state.disputes;
+  const currentTimestamp = Math.trunc(+Date.now() / 1000);
   const fakeUrls: string[] = [];
   const pendingUrls: string[] = [];
   Object.keys(disputes).forEach((d) => {
     if (disputes[d].winningOption == "fake") {
       fakeUrls.push(disputes[d].id);
     } else if (
-      disputes[d].expirationBlock > currentHeight &&
+      disputes[d].expirationTimestamp < currentTimestamp &&
+      disputes[d].winningOption == ""
+    ) {
+      let fakeSum = 0;
+      let legitSum = 0;
+      Object.keys(disputes[d].votes[0].votes).forEach(
+        (v) =>
+          (fakeSum += parseInt(disputes[d].votes[0].votes[v].quadraticAmount))
+      );
+      Object.keys(disputes[d].votes[1].votes).forEach(
+        (v) =>
+          (legitSum += parseInt(disputes[d].votes[0].votes[v].quadraticAmount))
+      );
+      if (fakeSum > legitSum) {
+        fakeUrls.push(disputes[d].id);
+      }
+    } else if (
+      disputes[d].expirationTimestamp > currentTimestamp &&
       disputes[d].winningOption == ""
     ) {
       pendingUrls.push(disputes[d].id);
     }
   });
+
   const isUrlFake = fakeUrls.some((url) =>
     document.location.href?.startsWith(url)
   );
@@ -66,18 +76,12 @@ function removeWarning() {
 
 async function getContractData() {
   const data = fetch(
-    `https://cache.redstone.tools/cache/state/pvudp_Wp8NMDJR6KUsQbzJJ27oLO4fAKXsnVQn86JbU`
+    `https://d2rkt3biev1br2.cloudfront.net/state?id=684ld6l9TfLdj4DYszP8l7fOc9kw5x5OuZD3NWuS46Q`
   ).then(async (res) => {
     const data = await res.json();
     return data;
   });
   return data;
-}
-
-async function loadBlockHeight() {
-  const info = await arweave.network.getInfo();
-  const currentHeight = info.height;
-  return currentHeight;
 }
 
 checkTabForFakeNews();

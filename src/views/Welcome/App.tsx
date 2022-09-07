@@ -25,7 +25,8 @@ import { browser } from "webextension-polyfill-ts";
 import bip39 from "bip39-web-crypto";
 import CryptoES from "crypto-es";
 import Arweave from "arweave";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/warp_logo.png";
+import arconnectLogo from "../../assets/logo.png";
 import styles from "../../styles/views/Welcome/view.module.sass";
 
 export default function App() {
@@ -298,23 +299,25 @@ export default function App() {
             Welcome{" "}
             {(walletsStore.length === 0 && (
               <>
-                to{" "}
-                <span style={{ color: theme.palette.success }}>ArConnect</span>
+                to <br />
+                <span style={{ color: theme.palette.success }}>Q-Rate</span>
               </>
             )) ||
               "back! :)"}
           </h1>
-          <p style={{ color: theme.palette.accents_4 }}>
-            Secure wallet management for Arweave
+          <div style={{ color: theme.palette.accents_4, padding: "0.5rem" }}>
+            <div>
+              Participate in disputes, stake tokens and help community in
+              detecting fake news.
+            </div>
             {!passwordGiven && (
-              <>
-                <br />
+              <div style={{ paddingTop: "1em" }}>
                 {walletsStore.length === 0
-                  ? "Please create a password to encrypt your keyfiles"
-                  : "Please enter your password"}
-              </>
+                  ? "Please create a password to encrypt your keyfiles."
+                  : "Please enter your password."}
+              </div>
             )}
-          </p>
+          </div>
           {(passwordGiven && (
             <div className={styles.Actions}>
               <Button onClick={() => loadWalletsModal.setVisible(true)}>
@@ -371,26 +374,34 @@ export default function App() {
               )}
             </>
           )}
-          <p style={{ marginTop: "1.75em" }}>
-            Read more about our{" "}
-            <span
-              onClick={() => feeModal.setVisible(true)}
-              style={{ color: theme.palette.link, cursor: "pointer" }}
-            >
-              fees
-            </span>
-            .
-          </p>
+          <div
+            style={{
+              marginTop: "1.75em",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column"
+            }}
+          >
+            <div>
+              Powered by{" "}
+              <a
+                href="https://www.arconnect.io/"
+                target="_blank"
+                style={{ color: theme.palette.link, cursor: "pointer" }}
+              >
+                ArConnect
+              </a>
+            </div>
+          </div>
+          <img
+            src={arconnectLogo}
+            alt="logo"
+            style={{ width: "2em", height: "2em" }}
+          />
         </Card>
       </div>
-      <a
-        className={styles.th8ta}
-        href="https://th8ta.org"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        th<span>8</span>ta
-      </a>
+
       <Modal {...loadWalletsModal.bindings}>
         <Modal.Title>Load wallet(s)</Modal.Title>
         <Modal.Subtitle>

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "ArFact",
-  "version": "0.0.3",
+  "name": "Q-Rate",
+  "version": "0.0.4",
   "author": "Redstone Team <dev@redstone.finance>",
   "description": "Arweave fake news checker",
   "permissions": ["activeTab", "storage"],
@@ -24,10 +24,7 @@
   "content_scripts": [
     {
       "matches": ["file://*/*", "http://*/*", "https://*/*"],
-      "js": [
-        "build/scripts/content.js",
-        "build/scripts/fake-news-content-script.js"
-      ],
+      "js": ["build/scripts/fake-news-content-script.js"],
       "run_at": "document_end"
     }
   ],
