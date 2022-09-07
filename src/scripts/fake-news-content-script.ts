@@ -18,10 +18,9 @@ async function checkTabForFakeNews() {
         (v) =>
           (fakeSum += parseInt(disputes[d].votes[0].votes[v].quadraticAmount))
       );
-      Object.keys(disputes[d].votes[1].votes).forEach(
-        (v) =>
-          (legitSum += parseInt(disputes[d].votes[0].votes[v].quadraticAmount))
-      );
+      Object.keys(disputes[d].votes[1].votes).forEach((v) => {
+        legitSum += parseInt(disputes[d].votes[1].votes[v].quadraticAmount);
+      });
       if (fakeSum > legitSum) {
         fakeUrls.push(disputes[d].id);
       }

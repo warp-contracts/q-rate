@@ -368,10 +368,13 @@ export default function FakeReporting({
                 textAlign: "center",
                 color: "#777",
                 marginBottom: "20px",
-                fontSize: "14px"
+                fontSize: "14px",
+                paddingRight: "30px",
+                paddingLeft: "30px"
               }}
             >
-              Balance for fake reports
+              If you'd like to mint some tokens, please contact us on{" "}
+              <a href="https://discord.com/invite/PVxBZKFr46">discord.</a>
             </div>
             <div
               style={{

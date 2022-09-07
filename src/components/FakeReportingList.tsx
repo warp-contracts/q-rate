@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Button, Input } from "@geist-ui/react";
+import { Button, Input, Spacer, Tooltip } from "@geist-ui/react";
 import {
   ContractDispute,
   Dispute,
   getVotesSum,
   VoteOption
 } from "../background/fake_news";
-import { cursorTo } from "readline";
-
+import HelpCircle from "@geist-ui/icons/helpCircle";
 interface Props {
   contractDisputes: ContractDispute;
   value: any;
@@ -80,16 +79,45 @@ export default function FakeReportingList({
                       alignItems: "center",
                       marginBottom: "10px",
                       marginRight: "0.5rem",
-                      width: "30%"
+                      width: "45%"
                     }}
                   >
                     <span style={{ textTransform: "uppercase" }}>
                       {v.label}
                     </span>
                     :{" "}
-                    <strong style={{ marginLeft: "0.25rem" }}>
-                      {getVotesSum(v.votes, divisibility)}
-                    </strong>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginLeft: "auto"
+                      }}
+                    >
+                      <strong style={{ marginLeft: "0.25rem" }}>
+                        {getVotesSum(v.votes, divisibility)}
+                      </strong>
+                      <div style={{ marginTop: "0.3rem" }}>
+                        <Tooltip
+                          placement="topStart"
+                          text={
+                            <>
+                              Votes are calculated according to the <br />
+                              quadratic voting procedure. <br /> You can read
+                              about it{" "}
+                              <a
+                                href="https://towardsdatascience.com/what-is-quadratic-voting-4f81805d5a06"
+                                target="_blank"
+                              >
+                                here.
+                              </a>
+                            </>
+                          }
+                        >
+                          <Spacer inline w={0.35} />
+                          <HelpCircle size={16} />
+                        </Tooltip>
+                      </div>
+                    </div>
                     <br />
                   </div>
                   {
