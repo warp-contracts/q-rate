@@ -325,6 +325,25 @@ export default function FakeReporting({
             >
               Balance for fake reports
             </div>
+            <div
+              style={{
+                fontSize: "14px",
+                marginBottom: "10px",
+                textAlign: "center",
+                color: "gray"
+              }}
+            >
+              Check out contract in
+              <a
+                style={{ paddingLeft: "0.25rem" }}
+                href={
+                  "https://sonar.redstone.tools/#/app/contract/pvudp_Wp8NMDJR6KUsQbzJJ27oLO4fAKXsnVQn86JbU"
+                }
+                target="_blank"
+              >
+                SonAR
+              </a>
+            </div>
           </div>
 
           {pageAlreadyReported && (
@@ -333,22 +352,19 @@ export default function FakeReporting({
                 fontSize: "14px",
                 marginBottom: "10px",
                 textAlign: "center",
-                color: "grey"
+                color: "grey",
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                maxWidth: "100%",
+                fontWeight: "bold"
               }}
             >
               Page already reported, please join in the dispute below.
               <br />
-              <div
-                style={{
-                  textOverflow: "ellipsis",
-                  overflow: "hidden",
-                  whiteSpace: "nowrap",
-                  maxWidth: "100%",
-                  fontWeight: "bold"
-                }}
-              >
+              <a href={tabUrl} target="_blank">
                 {tabUrl}
-              </div>
+              </a>
             </div>
           )}
           {!pageAlreadyReported && (
@@ -360,22 +376,19 @@ export default function FakeReporting({
                 style={{
                   fontSize: "14px",
                   marginBottom: "10px",
-                  textAlign: "center"
+                  textAlign: "center",
+                  textOverflow: "ellipsis",
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                  maxWidth: "100%",
+                  fontWeight: "bold"
                 }}
               >
                 Do you want to report this page as fake?
                 <br />
-                <div
-                  style={{
-                    textOverflow: "ellipsis",
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    maxWidth: "100%",
-                    fontWeight: "bold"
-                  }}
-                >
+                <a href={tabUrl} target="_blank">
                   {tabUrl}
-                </div>
+                </a>
               </div>
               {waitingForConfirmation && (
                 <>
@@ -435,20 +448,17 @@ export default function FakeReporting({
                       marginBottom: "10px",
                       color: "gray",
                       fontSize: "14px",
-                      border: "1px solid #a99eec"
+                      border: "1px solid #a99eec",
+                      textOverflow: "ellipsis",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      maxWidth: "100%",
+                      fontWeight: "bold"
                     }}
                   >
-                    <div
-                      style={{
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                        maxWidth: "100%",
-                        fontWeight: "bold"
-                      }}
-                    >
+                    <a href={dispute.key} target="_blank">
                       {dispute.key}
-                    </div>
+                    </a>
                     {dispute.value.votes.map((v: VoteOption, idx: number) => (
                       <div>
                         <hr />

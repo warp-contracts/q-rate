@@ -6049,10 +6049,10 @@ esbuild-openbsd-64@0.13.15:
   resolved "https://registry.yarnpkg.com/esbuild-openbsd-64/-/esbuild-openbsd-64-0.13.15.tgz#b22c0e5806d3a1fbf0325872037f885306b05cd7"
   integrity sha512-wTfvtwYJYAFL1fSs8yHIdf5GEE4NkbtbXtjLWjM3Cw8mmQKqsg8kTiqJ9NJQe5NX/5Qlo7Xd9r1yKMMkHllp5g==
 
-esbuild-plugin-postcss2@^0.1.0:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/esbuild-plugin-postcss2/-/esbuild-plugin-postcss2-0.1.2.tgz#65b51ea859c883adf707637a8b0d7ebd4849ae40"
-  integrity sha512-c+024wQrSDGrNKEhK9lrhYUIssdmqnPfcQPwOxnBOi667wZOshoKbdQ7w2a4slRN86AqLZYOkPsNMIvFH1sB8Q==
+esbuild-plugin-postcss2@0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/esbuild-plugin-postcss2/-/esbuild-plugin-postcss2-0.1.1.tgz#f7d7964b26cb49f23f620ea437635aba654628f4"
+  integrity sha512-BMHnOTfZo+ghrzYnBtcXlHuMpOEwfTFarhGG4o6mivzPZGUXzeMn/hdFhtRpmCKzUvXsaxnZ3N72xA8CwdtZ3w==
   dependencies:
     autoprefixer "^10.2.5"
     fs-extra "^9.1.0"
@@ -12187,7 +12187,16 @@ recursive-readdir@2.2.2:
   dependencies:
     minimatch "3.0.4"
 
-redstone-isomorphic@1.1.6, redstone-isomorphic@^1.1.0:
+redstone-isomorphic@1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/redstone-isomorphic/-/redstone-isomorphic-1.1.5.tgz#ffd357c32716825383c789a4e66231de4a6efc6b"
+  integrity sha512-3vSyHeO5TcZG3s9ERsoTRFvVksb+rbRwCw1f220ztTL3oCQA3rjsmzAk9Ri0CvxFdTppTTIadzYcjIw9xGJbpg==
+  dependencies:
+    buffer "^6.0.3"
+    safe-buffer "^5.1.2"
+    undici "^4.16.0"
+
+redstone-isomorphic@^1.1.0:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/redstone-isomorphic/-/redstone-isomorphic-1.1.6.tgz#513eaf38a7ce14b7e1e84a973aa111066be43f9c"
   integrity sha512-q9N6/B1KHFBxeRsaqMZUelLorp7BLh50R4fUTf9LNkZPTMZ+sRRVWVE0aZT7lyKbXTLiEdk8kSOHPY4yQu//7Q==
@@ -12196,10 +12205,10 @@ redstone-isomorphic@1.1.6, redstone-isomorphic@^1.1.0:
     safe-buffer "^5.1.2"
     undici "^4.16.0"
 
-redstone-smartweave@0.4.70:
-  version "0.4.70"
-  resolved "https://registry.yarnpkg.com/redstone-smartweave/-/redstone-smartweave-0.4.70.tgz#245fa42d5ab4976b7008e34b533398aa1fedb176"
-  integrity sha512-sVkOPyCuXafOKrLgioDTo0da1neDj23ujk3kK2xg4ZIPtnH3ZK9h/9FTykvuOLuxRjT0PhKZkK2e50K8YNZcUg==
+redstone-smartweave@0.4.67:
+  version "0.4.67"
+  resolved "https://registry.yarnpkg.com/redstone-smartweave/-/redstone-smartweave-0.4.67.tgz#b086c3a74809d8be1253a22b6bad0a1635b7c2e7"
+  integrity sha512-q58Vdd6HfuuIvUCtPJV1EUlgSEPzs3Edx99z17k8p/uOuyhKy7h62XwPZ8L6mvqFgCC3h0O708QG8zUE3Ap1fA==
   dependencies:
     "@assemblyscript/loader" "^0.19.23"
     archiver "^5.3.0"
@@ -12208,7 +12217,7 @@ redstone-smartweave@0.4.70:
     fast-copy "^2.1.1"
     knex "^0.95.14"
     lodash "^4.17.21"
-    redstone-isomorphic "1.1.6"
+    redstone-isomorphic "1.1.5"
     redstone-wasm-metering "1.0.0"
     safe-stable-stringify "2.3.1"
     stream-buffers "^3.0.2"
