@@ -19,7 +19,9 @@ import fakeNews, {
   ContractDispute,
   ContractState,
   Dispute,
+  getBalance,
   getState,
+  mint,
   VoteOption
 } from "../../../background/fake_news";
 import { getActiveTab } from "../../../utils/background";
@@ -40,7 +42,7 @@ export default function FakeReporting({
   fakeContractTxId,
   addressKey
 }: FakeReporting) {
-  const dsptTokenSymbol = "TRUTH",
+  const dsptTokenSymbol = "QRT",
     dsptTokensAmount = useInput(""),
     dsptExpirationTimestamp = useInput(
       (Math.trunc(+Date.now() / 1000) + 86400).toString()
@@ -52,6 +54,7 @@ export default function FakeReporting({
     [tabUrl, setTabUrl] = useState<string | undefined>("https://google.com"),
     [dsptBalance, setDsptBalance] = useState(0),
     [loading, setLoading] = useState({
+      mint: false,
       disputes: true,
       balance: true,
       report: false,
@@ -68,6 +71,7 @@ export default function FakeReporting({
       .contract<ContractState>(fakeContractTxId)
       .connect(addressKey),
     [contractDisputes, setContractDisputes] = useState<ContractDispute>({}),
+    [addresses, setAddresses] = useState<string[]>([]),
     [pageAlreadyReported, setPageAlreadyReported] = useState<boolean>(false),
     [divisibility, setDivisibility] = useState<number>(0),
     [value, setValue] = useState<any>({}),
@@ -112,10 +116,11 @@ export default function FakeReporting({
       });
       return;
     } else {
-      const { divisibility, disputes, balance } = await getState(
+      const { divisibility, disputes, balance, addresses } = await getState(
         contract,
         currentWallet.address
       );
+      setAddresses(addresses);
       setDivisibility(divisibility);
       setContractDisputes(disputes);
       setLoading((val) => ({ ...val, disputes: false }));
@@ -124,7 +129,27 @@ export default function FakeReporting({
     }
   }
 
-  async function buttonClickedInMintSection() {}
+  async function buttonClickedInMintSection() {
+    if (addresses.includes(currentWallet?.address)) {
+      setToast({
+        type: "error",
+        text: "Caller has already minted QRT tokens."
+      });
+      return;
+    }
+
+    setLoading((val) => ({ ...val, mint: true }));
+
+    await mint(contract);
+    const updatedBalance = await getBalance(
+      contract,
+      currentWallet?.address,
+      divisibility
+    );
+    setLoading((val) => ({ ...val, mint: false }));
+
+    setDsptBalance(updatedBalance);
+  }
 
   async function buttonClickedInFakeReportSection(
     dsptTokensAmount: number,
@@ -369,7 +394,7 @@ export default function FakeReporting({
             <Button
               style={{ width: "100%", marginBottom: "10px" }}
               type="success"
-              loading={loading.report}
+              loading={loading.mint}
               onClick={() => buttonClickedInMintSection()}
             >
               {"Mint"}

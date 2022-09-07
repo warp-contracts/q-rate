@@ -97,6 +97,7 @@ export async function getState(contract: Contract, address: string) {
   // );
 
   const { cachedValue: data } = await contract.readState();
+  const addresses = data.state.addresses;
   const divisibility = data.state.divisibility;
   const disputes = data.state.disputes;
   let balance = data.state.balances[address];
@@ -105,11 +106,29 @@ export async function getState(contract: Contract, address: string) {
   } else {
     balance = getRoundedTokens(balance, divisibility);
   }
-  return { divisibility, disputes, balance };
+  return { divisibility, disputes, balance, addresses };
 }
 
 export function getRoundedTokens(amount: number, divisibility: number): number {
   return Math.round(amount / divisibility);
+}
+
+export async function mint(contract: Contract) {
+  await contract.writeInteraction({ function: "mint", mint: { qty: 1000000 } });
+}
+
+export async function getBalance(
+  contract: Contract,
+  address: string,
+  divisibility: number
+) {
+  const { result } = await contract.viewState({
+    function: "balance",
+    balance: {
+      target: address
+    }
+  });
+  return getRoundedTokens(result.balance.balance, divisibility);
 }
 
 export function postMultipliedTokens(
