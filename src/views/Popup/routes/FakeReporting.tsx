@@ -157,7 +157,6 @@ export default function FakeReporting({
     dsptTokensAmount: number,
     dsptExpirationTimestamp: string
   ) {
-    console.log(dsptExpirationTimestamp);
     const parsedExpiration = (
       Math.trunc(+Date.now() / 1000) + parseInt(dsptExpirationTimestamp)
     ).toString();
@@ -170,9 +169,7 @@ export default function FakeReporting({
     }
     let parsedExpirationTimestamp;
 
-    console.log("lenght", parsedExpiration.length);
     if (parsedExpiration.length === 13) {
-      console.log("test1");
       parsedExpirationTimestamp = Math.trunc(
         parseInt(parsedExpiration) / 1000
       ).toString();
@@ -190,13 +187,6 @@ export default function FakeReporting({
       if (
         parseInt(parsedExpirationTimestamp) <= Math.trunc(+Date.now() / 1000)
       ) {
-        console.log("test2", parsedExpirationTimestamp);
-        console.log("test3", parseInt(parsedExpirationTimestamp));
-        console.log("test4", Math.trunc(+Date.now() / 1000));
-        console.log(
-          "test5",
-          parseInt(parsedExpirationTimestamp) <= Math.trunc(+Date.now() / 1000)
-        );
         setToast({
           type: "error",
           text: "Expiration timestamp should be set to future!"
@@ -532,7 +522,13 @@ export default function FakeReporting({
                       min="0"
                     />
                   </div>
-                  <div style={{ marginBottom: "10px", display: "flex" }}>
+                  <div
+                    style={{
+                      marginBottom: "20px",
+                      marginTop: "20px",
+                      display: "flex"
+                    }}
+                  >
                     <div style={{ width: "22%", alignSelf: "center" }}>
                       Expiry:
                     </div>
@@ -545,13 +541,6 @@ export default function FakeReporting({
                       <Radio value="86400">1 day</Radio>
                       <Radio value="604800">7 days</Radio>
                     </Radio.Group>
-                    {/* <Input
-                      {...dsptExpirationTimestamp.bindings}
-                      placeholder={`Expiration timestamp`}
-                      labelRight={"Expiration timestamp"}
-                      htmlType="number"
-                      min="0"
-                    /> */}
                   </div>
                 </>
               )}
