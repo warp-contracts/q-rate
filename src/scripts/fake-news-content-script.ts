@@ -75,7 +75,7 @@ function removeWarning() {
 
 async function getContractData() {
   const data = fetch(
-    `https://d2rkt3biev1br2.cloudfront.net/state?id=qx1z1YInqcp4Vf5amJER2R8E_SEyY6pmHS1912VSUAs`
+    `https://d2rkt3biev1br2.cloudfront.net/state?id=SaGNYkJaCiOjYYKBZUi8zvhS5R8gm_aFKWALKdGitYo`
   ).then(async (res) => {
     const data = await res.json();
     return data;

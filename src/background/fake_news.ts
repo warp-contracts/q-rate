@@ -92,10 +92,12 @@ async function withdrawRewards(
 }
 
 export async function getState(contract: Contract, address: string) {
-  const { data }: any = await axios.get(
-    `${den}/state?id=${fakeNewsContractId}&snowball=false`
-  );
+  // const { data }: any = await axios.get(
+  //   `${den}/state?id=${fakeNewsContractId}&snowball=false`
+  // );
 
+  const { cachedValue } = await contract.readState();
+  const data = cachedValue;
   const addresses = data.state.addresses;
   const divisibility = data.state.divisibility;
   const disputes = data.state.disputes;
@@ -113,7 +115,10 @@ export function getRoundedTokens(amount: number, divisibility: number): number {
 }
 
 export async function mint(contract: Contract) {
-  await contract.writeInteraction({ function: "mint", mint: { qty: 1000000 } });
+  await contract.writeInteraction({
+    function: "mint",
+    mint: { qty: "1000000" }
+  });
 }
 
 export async function getBalance(

@@ -40,7 +40,7 @@ export default function App() {
       "page" | "pdf" | undefined
     >("page"),
     smartweave = WarpFactory.forMainnet(),
-    fakeContractTxId = "qx1z1YInqcp4Vf5amJER2R8E_SEyY6pmHS1912VSUAs";
+    fakeContractTxId = "SaGNYkJaCiOjYYKBZUi8zvhS5R8gm_aFKWALKdGitYo";
 
   useEffect(() => {
     if (wallets.length === 0)
