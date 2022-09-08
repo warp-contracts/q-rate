@@ -5,6 +5,7 @@ import {
   Button,
   Input,
   Loading,
+  Radio,
   Spacer,
   Tabs,
   useInput,
@@ -44,9 +45,10 @@ export default function FakeReporting({
 }: FakeReporting) {
   const dsptTokenSymbol = "QRT",
     dsptTokensAmount = useInput(""),
-    dsptExpirationTimestamp = useInput(
-      (Math.trunc(+Date.now() / 1000) + 86400).toString()
-    ),
+    // dsptExpirationTimestamp = useInput(
+    //   (Math.trunc(+Date.now() / 1000) + 86400).toString()
+    // ),
+    [dsptExpirationTimestamp, setDsptExpirationTimestamp] = useState("600"),
     [waitingForConfirmation, setWaitingForConfirmation] = useState(false),
     profile = useSelector((state: RootState) => state.profile),
     wallets = useSelector((state: RootState) => state.wallets),
@@ -155,10 +157,11 @@ export default function FakeReporting({
     dsptTokensAmount: number,
     dsptExpirationTimestamp: string
   ) {
-    if (
-      dsptExpirationTimestamp.length < 10 ||
-      dsptExpirationTimestamp.length > 13
-    ) {
+    console.log(dsptExpirationTimestamp);
+    const parsedExpiration = (
+      Math.trunc(+Date.now() / 1000) + parseInt(dsptExpirationTimestamp)
+    ).toString();
+    if (parsedExpiration.length < 10 || parsedExpiration.length > 13) {
       setToast({
         type: "error",
         text: "Incorrect timestamp."
@@ -167,12 +170,14 @@ export default function FakeReporting({
     }
     let parsedExpirationTimestamp;
 
-    if (dsptExpirationTimestamp.length == 13) {
+    console.log("lenght", parsedExpiration.length);
+    if (parsedExpiration.length === 13) {
+      console.log("test1");
       parsedExpirationTimestamp = Math.trunc(
-        parseInt(dsptExpirationTimestamp) / 1000
+        parseInt(parsedExpiration) / 1000
       ).toString();
     } else {
-      parsedExpirationTimestamp = dsptExpirationTimestamp;
+      parsedExpirationTimestamp = parsedExpiration;
     }
     if (waitingForConfirmation) {
       if (dsptBalance < dsptTokensAmount) {
@@ -185,6 +190,13 @@ export default function FakeReporting({
       if (
         parseInt(parsedExpirationTimestamp) <= Math.trunc(+Date.now() / 1000)
       ) {
+        console.log("test2", parsedExpirationTimestamp);
+        console.log("test3", parseInt(parsedExpirationTimestamp));
+        console.log("test4", Math.trunc(+Date.now() / 1000));
+        console.log(
+          "test5",
+          parseInt(parsedExpirationTimestamp) <= Math.trunc(+Date.now() / 1000)
+        );
         setToast({
           type: "error",
           text: "Expiration timestamp should be set to future!"
@@ -359,6 +371,15 @@ export default function FakeReporting({
     marginBottom: "10px"
   };
 
+  const expirationTimestampHandler = (val: string | number) => {
+    // const time = (
+    //   Math.trunc(+Date.now() / 1000) + typeof val === "string"
+    //     ? parseInt(val)
+    //     : val
+    // ).toString();
+    setDsptExpirationTimestamp(val);
+  };
+
   return (
     <>
       <WalletManager />
@@ -511,14 +532,26 @@ export default function FakeReporting({
                       min="0"
                     />
                   </div>
-                  <div style={{ marginBottom: "10px" }}>
-                    <Input
+                  <div style={{ marginBottom: "10px", display: "flex" }}>
+                    <div style={{ width: "22%", alignSelf: "center" }}>
+                      Expiry:
+                    </div>
+                    <Radio.Group
+                      value={dsptExpirationTimestamp}
+                      onChange={expirationTimestampHandler}
+                      useRow
+                    >
+                      <Radio value="600">10 minutes</Radio>
+                      <Radio value="86400">1 day</Radio>
+                      <Radio value="604800">7 days</Radio>
+                    </Radio.Group>
+                    {/* <Input
                       {...dsptExpirationTimestamp.bindings}
                       placeholder={`Expiration timestamp`}
                       labelRight={"Expiration timestamp"}
                       htmlType="number"
                       min="0"
-                    />
+                    /> */}
                   </div>
                 </>
               )}
@@ -530,7 +563,7 @@ export default function FakeReporting({
                 onClick={() =>
                   buttonClickedInFakeReportSection(
                     parseInt(dsptTokensAmount.state),
-                    dsptExpirationTimestamp.state
+                    dsptExpirationTimestamp
                   )
                 }
               >
