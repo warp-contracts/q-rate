@@ -1,4 +1,4 @@
-import { PermissionType } from "../../utils/permissions";
+import { PermissionType } from '../../utils/permissions';
 
 export interface IPermissionState {
   url: string;
@@ -6,7 +6,7 @@ export interface IPermissionState {
 }
 
 export interface IPermissionsAction {
-  type: "SET_PERMISSIONS" | "REMOVE_PERMISSIONS" | "USER_SIGNOUT";
+  type: 'SET_PERMISSIONS' | 'REMOVE_PERMISSIONS' | 'USER_SIGNOUT';
   payload: IPermissionState;
 }
 
@@ -15,13 +15,13 @@ export default function permissionsReducer(
   action: IPermissionsAction
 ): IPermissionState[] {
   switch (action.type) {
-    case "SET_PERMISSIONS":
+    case 'SET_PERMISSIONS':
       return [
         ...state.filter(({ url }) => url !== action.payload.url),
         action.payload
       ];
 
-    case "REMOVE_PERMISSIONS":
+    case 'REMOVE_PERMISSIONS':
       const item = state.find(({ url }) => url === action.payload.url);
       if (!item) break;
       return [
@@ -34,7 +34,7 @@ export default function permissionsReducer(
         }
       ];
 
-    case "USER_SIGNOUT":
+    case 'USER_SIGNOUT':
       return [];
   }
 

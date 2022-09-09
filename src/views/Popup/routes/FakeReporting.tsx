@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../stores/reducers";
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../stores/reducers';
 import {
   Button,
   Input,
@@ -10,12 +10,12 @@ import {
   Tabs,
   useInput,
   useToasts
-} from "@geist-ui/react";
-import { JWKInterface } from "arweave/node/lib/wallet";
-import { VerifiedIcon } from "@primer/octicons-react";
-import Arweave from "arweave";
-import WalletManager from "../../../components/WalletManager";
-import styles from "../../../styles/views/Popup/send.module.sass";
+} from '@geist-ui/react';
+import { JWKInterface } from 'arweave/node/lib/wallet';
+import { VerifiedIcon } from '@primer/octicons-react';
+import Arweave from 'arweave';
+import WalletManager from '../../../components/WalletManager';
+import styles from '../../../styles/views/Popup/send.module.sass';
 import fakeNews, {
   ContractDispute,
   ContractState,
@@ -24,11 +24,11 @@ import fakeNews, {
   getState,
   mint,
   VoteOption
-} from "../../../background/fake_news";
-import { getActiveTab } from "../../../utils/background";
-import { Warp, Contract } from "warp-contracts";
-import FakeReportingList from "../../../components/FakeReportingList";
-import { fakeNewsContractId } from "../../../utils/constants";
+} from '../../../background/fake_news';
+import { getActiveTab } from '../../../utils/background';
+import { Warp, Contract } from 'warp-contracts';
+import FakeReportingList from '../../../components/FakeReportingList';
+import { fakeNewsContractId } from '../../../utils/constants';
 
 export interface FakeReporting {
   arweave: Arweave;
@@ -43,17 +43,17 @@ export default function FakeReporting({
   fakeContractTxId,
   addressKey
 }: FakeReporting) {
-  const dsptTokenSymbol = "QRT",
-    dsptTokensAmount = useInput(""),
+  const dsptTokenSymbol = 'QRT',
+    dsptTokensAmount = useInput(''),
     // dsptExpirationTimestamp = useInput(
     //   (Math.trunc(+Date.now() / 1000) + 86400).toString()
     // ),
-    [dsptExpirationTimestamp, setDsptExpirationTimestamp] = useState("600"),
+    [dsptExpirationTimestamp, setDsptExpirationTimestamp] = useState('600'),
     [waitingForConfirmation, setWaitingForConfirmation] = useState(false),
     profile = useSelector((state: RootState) => state.profile),
     wallets = useSelector((state: RootState) => state.wallets),
     currentWallet = wallets.find(({ address }) => address === profile),
-    [tabUrl, setTabUrl] = useState<string | undefined>("https://google.com"),
+    [tabUrl, setTabUrl] = useState<string | undefined>('https://google.com'),
     [dsptBalance, setDsptBalance] = useState(0),
     [loading, setLoading] = useState({
       mint: false,
@@ -105,7 +105,7 @@ export default function FakeReporting({
   async function loadActiveTab() {
     const currentTab = await getActiveTab();
     const shortUrl = currentTab.url
-      ? currentTab.url.split("?")[0]
+      ? currentTab.url.split('?')[0]
       : currentTab.url;
     setTabUrl(shortUrl);
   }
@@ -113,8 +113,8 @@ export default function FakeReporting({
   async function fetchContractDisputes() {
     if (!currentWallet) {
       setToast({
-        type: "error",
-        text: "No address specified."
+        type: 'error',
+        text: 'No address specified.'
       });
       return;
     } else {
@@ -134,8 +134,8 @@ export default function FakeReporting({
   async function buttonClickedInMintSection() {
     if (addresses.includes(currentWallet?.address)) {
       setToast({
-        type: "error",
-        text: "Caller has already minted QRT tokens."
+        type: 'error',
+        text: 'Caller has already minted QRT tokens.'
       });
       return;
     }
@@ -162,8 +162,8 @@ export default function FakeReporting({
     ).toString();
     if (parsedExpiration.length < 10 || parsedExpiration.length > 13) {
       setToast({
-        type: "error",
-        text: "Incorrect timestamp."
+        type: 'error',
+        text: 'Incorrect timestamp.'
       });
       return;
     }
@@ -179,8 +179,8 @@ export default function FakeReporting({
     if (waitingForConfirmation) {
       if (dsptBalance < dsptTokensAmount) {
         setToast({
-          type: "error",
-          text: "You need to mint some tokens first!"
+          type: 'error',
+          text: 'You need to mint some tokens first!'
         });
         return;
       }
@@ -188,15 +188,15 @@ export default function FakeReporting({
         parseInt(parsedExpirationTimestamp) <= Math.trunc(+Date.now() / 1000)
       ) {
         setToast({
-          type: "error",
-          text: "Expiration timestamp should be set to future!"
+          type: 'error',
+          text: 'Expiration timestamp should be set to future!'
         });
         return;
       }
       if (!tabUrl) {
         setToast({
-          type: "error",
-          text: "No url available."
+          type: 'error',
+          text: 'No url available.'
         });
         return;
       }
@@ -227,7 +227,7 @@ export default function FakeReporting({
     contractDisputes[dispute].votes.forEach((v: VoteOption) => {
       if (Object.keys(v.votes).includes(profile)) {
         setToast({
-          type: "error",
+          type: 'error',
           text: "You've already voted for this dispute!"
         });
         voted = true;
@@ -237,23 +237,23 @@ export default function FakeReporting({
     if (voted) {
       setValue({
         ...value,
-        [2 * disputeIdx + selectedOptionIndex]: ""
+        [2 * disputeIdx + selectedOptionIndex]: ''
       });
       return;
     }
     if (!dsptStakeAmountState) {
       setToast({
-        type: "error",
-        text: "You need to enter stake amount."
+        type: 'error',
+        text: 'You need to enter stake amount.'
       });
       return;
     }
 
     if (dsptBalance < dsptStakeAmountState) {
-      setToast({ type: "error", text: "You need to mint some tokens first!" });
+      setToast({ type: 'error', text: 'You need to mint some tokens first!' });
       setValue({
         ...value,
-        [2 * disputeIdx + selectedOptionIndex]: ""
+        [2 * disputeIdx + selectedOptionIndex]: ''
       });
       return;
     }
@@ -275,7 +275,7 @@ export default function FakeReporting({
     await fetchContractDisputes();
     setValue({
       ...value,
-      [2 * disputeIdx + selectedOptionIndex]: ""
+      [2 * disputeIdx + selectedOptionIndex]: ''
     });
     setLoading((val) => ({
       ...val,
@@ -299,8 +299,8 @@ export default function FakeReporting({
     });
     if (!voted) {
       setToast({
-        type: "error",
-        text: "You are not authorized to withdraw reward."
+        type: 'error',
+        text: 'You are not authorized to withdraw reward.'
       });
       return;
     }
@@ -310,7 +310,7 @@ export default function FakeReporting({
       !contractDisputes[dispute].withdrawableAmounts.hasOwnProperty(profile)
     ) {
       setToast({
-        type: "error",
+        type: 'error',
         text: "You've lost the dispute."
       });
       return;
@@ -320,7 +320,7 @@ export default function FakeReporting({
       contractDisputes[dispute].withdrawableAmounts[profile] == 0
     ) {
       setToast({
-        type: "error",
+        type: 'error',
         text: "You've already withdrawn your reward."
       });
       return;
@@ -337,7 +337,7 @@ export default function FakeReporting({
 
     await fetchContractDisputes();
     setToast({
-      type: "success",
+      type: 'success',
       text: `Your reward has been withdrawn.`
     });
 
@@ -357,8 +357,8 @@ export default function FakeReporting({
     );
   };
   const subSectionStyles = {
-    borderBottom: "1px solid #ddd",
-    marginBottom: "10px"
+    borderBottom: '1px solid #ddd',
+    marginBottom: '10px'
   };
 
   const expirationTimestampHandler = (val: string | number) => {
@@ -377,24 +377,24 @@ export default function FakeReporting({
         <div
           className={
             verified && verified.verified
-              ? styles.Amount + " " + styles.Target
-              : ""
+              ? styles.Amount + ' ' + styles.Target
+              : ''
           }
         >
           <div
             className="dspt-balance"
-            style={{ textAlign: "center", ...subSectionStyles }}
+            style={{ textAlign: 'center', ...subSectionStyles }}
           >
-            <h2 style={{ marginBottom: "0px" }}>
+            <h2 style={{ marginBottom: '0px' }}>
               {loading.balance && <Loading />}
               {!loading.balance && (
                 <>
                   <span>{dsptBalance}</span> <span>{dsptTokenSymbol}</span>
                   <span
                     style={{
-                      position: "relative",
-                      left: "5px",
-                      bottom: "8px"
+                      position: 'relative',
+                      left: '5px',
+                      bottom: '8px'
                     }}
                   >
                     <VerifiedIcon size={26} />
@@ -403,13 +403,13 @@ export default function FakeReporting({
               )}
             </h2>
             <Button
-              style={{ width: "20%", marginBottom: "10px" }}
+              style={{ width: '20%', marginBottom: '10px' }}
               type="success"
               ghost
               loading={loading.mint}
               onClick={() => buttonClickedInMintSection()}
             >
-              {"Mint"}
+              {'Mint'}
             </Button>
             {/* <div
               style={{
@@ -426,15 +426,15 @@ export default function FakeReporting({
             </div> */}
             <div
               style={{
-                fontSize: "14px",
-                marginBottom: "10px",
-                textAlign: "center",
-                color: "gray"
+                fontSize: '14px',
+                marginBottom: '10px',
+                textAlign: 'center',
+                color: 'gray'
               }}
             >
               Verify contract in
               <a
-                style={{ paddingLeft: "0.25rem" }}
+                style={{ paddingLeft: '0.25rem' }}
                 href={`https://sonar.redstone.tools/#/app/contract/${fakeNewsContractId}`}
                 target="_blank"
               >
@@ -446,30 +446,30 @@ export default function FakeReporting({
           {pageAlreadyReported && (
             <div
               className="report-page-as-fake"
-              style={{ ...subSectionStyles, color: "gray" }}
+              style={{ ...subSectionStyles, color: 'gray' }}
             >
               <div
                 style={{
-                  fontSize: "14px",
-                  marginBottom: "10px",
-                  textAlign: "center",
-                  color: "grey",
-                  fontWeight: "bold"
+                  fontSize: '14px',
+                  marginBottom: '10px',
+                  textAlign: 'center',
+                  color: 'grey',
+                  fontWeight: 'bold'
                 }}
               >
                 Page already reported, please join in the dispute below.
               </div>
               <div
                 style={{
-                  fontSize: "14px",
-                  marginBottom: "10px",
-                  textAlign: "center",
-                  color: "grey",
-                  textOverflow: "ellipsis",
-                  overflow: "hidden",
-                  whiteSpace: "nowrap",
-                  maxWidth: "100%",
-                  fontWeight: "bold"
+                  fontSize: '14px',
+                  marginBottom: '10px',
+                  textAlign: 'center',
+                  color: 'grey',
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  maxWidth: '100%',
+                  fontWeight: 'bold'
                 }}
               >
                 <a href={tabUrl} target="_blank">
@@ -481,29 +481,29 @@ export default function FakeReporting({
           {!pageAlreadyReported && (
             <div
               className="report-page-as-fake"
-              style={{ ...subSectionStyles, color: "gray" }}
+              style={{ ...subSectionStyles, color: 'gray' }}
             >
               <div
                 style={{
-                  fontSize: "14px",
-                  textAlign: "center",
-                  color: "grey",
-                  fontWeight: "bold"
+                  fontSize: '14px',
+                  textAlign: 'center',
+                  color: 'grey',
+                  fontWeight: 'bold'
                 }}
               >
                 Do you want to report this page as fake?
               </div>
               <div
                 style={{
-                  fontSize: "14px",
-                  marginBottom: "10px",
-                  textAlign: "center",
-                  color: "grey",
-                  textOverflow: "ellipsis",
-                  overflow: "hidden",
-                  whiteSpace: "nowrap",
-                  maxWidth: "100%",
-                  fontWeight: "bold"
+                  fontSize: '14px',
+                  marginBottom: '10px',
+                  textAlign: 'center',
+                  color: 'grey',
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  maxWidth: '100%',
+                  fontWeight: 'bold'
                 }}
               >
                 <a href={tabUrl} target="_blank">
@@ -512,8 +512,8 @@ export default function FakeReporting({
               </div>
               {waitingForConfirmation && (
                 <>
-                  {" "}
-                  <div style={{ marginBottom: "10px" }}>
+                  {' '}
+                  <div style={{ marginBottom: '10px' }}>
                     <Input
                       {...dsptTokensAmount.bindings}
                       placeholder={`Initial stake amount`}
@@ -524,12 +524,12 @@ export default function FakeReporting({
                   </div>
                   <div
                     style={{
-                      marginBottom: "20px",
-                      marginTop: "20px",
-                      display: "flex"
+                      marginBottom: '20px',
+                      marginTop: '20px',
+                      display: 'flex'
                     }}
                   >
-                    <div style={{ width: "22%", alignSelf: "center" }}>
+                    <div style={{ width: '22%', alignSelf: 'center' }}>
                       Expiry:
                     </div>
                     <Radio.Group
@@ -546,7 +546,7 @@ export default function FakeReporting({
               )}
 
               <Button
-                style={{ width: "100%", marginBottom: "10px" }}
+                style={{ width: '100%', marginBottom: '10px' }}
                 type="success"
                 loading={loading.report}
                 onClick={() =>
@@ -556,14 +556,14 @@ export default function FakeReporting({
                   )
                 }
               >
-                {waitingForConfirmation ? "Confirm fake report" : "Report fake"}
+                {waitingForConfirmation ? 'Confirm fake report' : 'Report fake'}
               </Button>
             </div>
           )}
 
           {/* Reports list */}
           <div className="fake-reports-list" style={{ ...subSectionStyles }}>
-            <h4 style={{ textAlign: "center" }}>Fake reports</h4>
+            <h4 style={{ textAlign: 'center' }}>Fake reports</h4>
             {loading.disputes && (
               <>
                 <Spacer h={0.5} />
@@ -580,7 +580,7 @@ export default function FakeReporting({
                       (dispute: Dispute) =>
                         dispute.expirationTimestamp - currentTimestamp > 0 &&
                         dispute.description !=
-                          "https://www.nts.live/shows/moxie"
+                          'https://www.nts.live/shows/moxie'
                     )}
                     value={value}
                     handler={handler}
@@ -600,8 +600,8 @@ export default function FakeReporting({
                       contractDisputes,
                       (dispute: Dispute) =>
                         dispute.expirationTimestamp - currentTimestamp <= 0 &&
-                        countVotesSumForLabel(dispute, "fake") >
-                          countVotesSumForLabel(dispute, "legit")
+                        countVotesSumForLabel(dispute, 'fake') >
+                          countVotesSumForLabel(dispute, 'legit')
                     )}
                     value={value}
                     handler={handler}
@@ -621,8 +621,8 @@ export default function FakeReporting({
                       contractDisputes,
                       (dispute: Dispute) =>
                         dispute.expirationTimestamp - currentTimestamp <= 0 &&
-                        countVotesSumForLabel(dispute, "fake") <=
-                          countVotesSumForLabel(dispute, "legit")
+                        countVotesSumForLabel(dispute, 'fake') <=
+                          countVotesSumForLabel(dispute, 'legit')
                     )}
                     value={value}
                     handler={handler}

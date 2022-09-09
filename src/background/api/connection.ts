@@ -1,15 +1,15 @@
-import { IPermissionState } from "../../stores/reducers/permissions";
+import { IPermissionState } from '../../stores/reducers/permissions';
 import {
   createAuthPopup,
   getPermissions,
   getStoreData,
   setStoreData
-} from "../../utils/background";
-import { MessageFormat, validateMessage } from "../../utils/messenger";
-import { browser } from "webextension-polyfill-ts";
-import { getRealURL } from "../../utils/url";
-import { createContextMenus } from "../context_menus";
-import { updateIcon } from "../icon";
+} from '../../utils/background';
+import { MessageFormat, validateMessage } from '../../utils/messenger';
+import { browser } from 'webextension-polyfill-ts';
+import { getRealURL } from '../../utils/url';
+import { createContextMenus } from '../context_menus';
+import { updateIcon } from '../icon';
 
 /**
  * APIs for a Web 2 like login system, but
@@ -29,7 +29,7 @@ export const connect = (
     if (!message.permissions)
       return resolve({
         res: false,
-        message: "No permissions requested"
+        message: 'No permissions requested'
       });
 
     // check requested permissions and existing permissions
@@ -50,7 +50,7 @@ export const connect = (
       if (hasAllPermissions)
         return resolve({
           res: false,
-          message: "All permissions are already allowed for this site"
+          message: 'All permissions are already allowed for this site'
         });
     }
     message.appInfo.logo = faviconUrl || message.appInfo?.logo;
@@ -58,11 +58,11 @@ export const connect = (
     createAuthPopup({
       permissions: message.permissions,
       appInfo: message.appInfo,
-      type: "connect",
+      type: 'connect',
       url: tabURL
     });
     browser.runtime.onMessage.addListener(async (msg) => {
-      if (!validateMessage(msg, { sender: "popup", type: "connect_result" }))
+      if (!validateMessage(msg, { sender: 'popup', type: 'connect_result' }))
         return;
       updateIcon(msg?.res);
       createContextMenus(msg?.res);
@@ -82,6 +82,6 @@ export const disconnect = (tabURL: string) =>
       updateIcon(false);
       resolve({ res: true });
     } catch {
-      resolve({ res: false, message: "Could not disconnect" });
+      resolve({ res: false, message: 'Could not disconnect' });
     }
   });

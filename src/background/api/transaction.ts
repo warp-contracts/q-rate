@@ -1,6 +1,6 @@
-import { createData, signers } from "../../../bin/arbundles/bundle";
-import { JWKInterface } from "arweave/web/lib/wallet";
-import { Allowance } from "../../stores/reducers/allowances";
+import { createData, signers } from '../../../bin/arbundles/bundle';
+import { JWKInterface } from 'arweave/web/lib/wallet';
+import { Allowance } from '../../stores/reducers/allowances';
 import {
   createAuthPopup,
   DispatchResult,
@@ -11,19 +11,19 @@ import {
   getStoreData,
   setStoreData,
   uploadDataToBundlr
-} from "../../utils/background";
-import { SignatureOptions } from "arweave/web/lib/crypto/crypto-interface";
-import { MessageFormat, validateMessage } from "../../utils/messenger";
-import { getRealURL } from "../../utils/url";
-import { browser } from "webextension-polyfill-ts";
-import Transaction, { Tag } from "arweave/web/lib/transaction";
-import Arweave from "arweave";
-import manifest from "../../../public/manifest.json";
-import axios from "axios";
+} from '../../utils/background';
+import { SignatureOptions } from 'arweave/web/lib/crypto/crypto-interface';
+import { MessageFormat, validateMessage } from '../../utils/messenger';
+import { getRealURL } from '../../utils/url';
+import { browser } from 'webextension-polyfill-ts';
+import Transaction, { Tag } from 'arweave/web/lib/transaction';
+import Arweave from 'arweave';
+import manifest from '../../../public/manifest.json';
+import axios from 'axios';
 
 const arConnectTags = [
-  { name: "Signing-Client", value: "ArConnect" },
-  { name: "Signing-Client-Version", value: manifest.version }
+  { name: 'Signing-Client', value: 'ArConnect' },
+  { name: 'Signing-Client-Version', value: manifest.version }
 ];
 
 // sign a transaction using the currently selected
@@ -40,12 +40,12 @@ export const signTransaction = (
         parseFloat(transaction.quantity) + parseFloat(transaction.reward);
       const arweave = new Arweave(await getArweaveConfig()),
         storeData = await getStoreData(),
-        arConfettiSetting = storeData?.["settings"]?.arConfetti,
-        allowances: Allowance[] = storeData?.["allowances"] ?? [],
+        arConfettiSetting = storeData?.['settings']?.arConfetti,
+        allowances: Allowance[] = storeData?.['allowances'] ?? [],
         allowanceForURL = allowances.find(
           ({ url }) => url === getRealURL(tabURL)
         ),
-        feeMultiplier = storeData?.["settings"]?.feeMultiplier || 1,
+        feeMultiplier = storeData?.['settings']?.feeMultiplier || 1,
         // should we open an auth popup for the user
         // to update their allowance limit
         // this is true, if the user has allowances
@@ -58,7 +58,7 @@ export const signTransaction = (
           parseFloat(arweave.ar.arToWinston(allowanceForURL.limit.toString())) <
             allowanceForURL.spent + price;
 
-      let decryptionKey = (await browser.storage.local.get("decryptionKey"))
+      let decryptionKey = (await browser.storage.local.get('decryptionKey'))
         ?.decryptionKey;
 
       const sign = async () => {
@@ -67,11 +67,11 @@ export const signTransaction = (
         try {
           userData = await getActiveKeyfile();
         } catch {
-          browser.tabs.create({ url: browser.runtime.getURL("/welcome.html") });
+          browser.tabs.create({ url: browser.runtime.getURL('/welcome.html') });
 
           return {
             res: false,
-            message: "No wallets added"
+            message: 'No wallets added'
           };
         }
 
@@ -114,10 +114,10 @@ export const signTransaction = (
             userData.keyfile
           );
 
-          feeTx.addTag("App-Name", "ArConnect");
-          feeTx.addTag("App-Version", manifest.version);
-          feeTx.addTag("Type", "Fee-Transaction");
-          feeTx.addTag("Linked-Transaction", decodeTransaction.id);
+          feeTx.addTag('App-Name', 'ArConnect');
+          feeTx.addTag('App-Version', manifest.version);
+          feeTx.addTag('Type', 'Fee-Transaction');
+          feeTx.addTag('Linked-Transaction', decodeTransaction.id);
 
           // fee multiplication
           if (feeMultiplier > 1) {
@@ -157,20 +157,20 @@ export const signTransaction = (
           data: undefined,
           // only return the arconnect tags
           tags: decodeTransaction
-            .get("tags")
+            .get('tags')
             // @ts-expect-error
             .filter(
               (tag: Tag) =>
                 !!arConnectTags.find(
                   ({ name }) =>
-                    name === tag.get("name", { decode: true, string: true })
+                    name === tag.get('name', { decode: true, string: true })
                 )
             )
         };
 
         return {
           res: true,
-          message: "Success",
+          message: 'Success',
           transaction: returnTransaction,
           arConfetti: arConfettiSetting === undefined ? true : arConfettiSetting
         };
@@ -180,7 +180,7 @@ export const signTransaction = (
       // or if the spending limit is reached
       if (!decryptionKey || openAllowance) {
         createAuthPopup({
-          type: "sign_auth",
+          type: 'sign_auth',
           url: tabURL,
           spendingLimitReached: openAllowance
         });
@@ -188,8 +188,8 @@ export const signTransaction = (
           browser.runtime.onMessage.removeListener(listenerCallback);
           if (
             !validateMessage(msg, {
-              sender: "popup",
-              type: "sign_auth_result"
+              sender: 'popup',
+              type: 'sign_auth_result'
             }) ||
             !msg.res
           ) {
@@ -245,11 +245,11 @@ export async function dispatch(tx: object): Promise<{
     };
   }
 
-  const data = transaction.get("data", { decode: true, string: false });
+  const data = transaction.get('data', { decode: true, string: false });
   // @ts-expect-error
-  const tags = (transaction.get("tags") as Tag[]).map((tag) => ({
-    name: tag.get("name", { decode: true, string: true }),
-    value: tag.get("value", { decode: true, string: true })
+  const tags = (transaction.get('tags') as Tag[]).map((tag) => ({
+    name: tag.get('name', { decode: true, string: true }),
+    value: tag.get('value', { decode: true, string: true })
   }));
 
   // add ArConnect tags to the tag list
@@ -273,11 +273,11 @@ export async function dispatch(tx: object): Promise<{
       res: true,
       data: {
         id: dataEntry.id,
-        type: "BUNDLED"
+        type: 'BUNDLED'
       }
     };
   } catch (e) {
-    console.log("Error signing", e);
+    console.log('Error signing', e);
 
     try {
       // sign & post if there is something wrong with the bundlr
@@ -312,7 +312,7 @@ export async function dispatch(tx: object): Promise<{
         res: true,
         data: {
           id: transaction.id,
-          type: "BASE"
+          type: 'BASE'
         }
       };
     } catch (e) {
@@ -328,7 +328,7 @@ async function selectVRTHolder() {
   try {
     const res: any = (
       await axios.get(
-        "https://v2.cache.verto.exchange/usjm4PCxUd5mtaon7zc97-dt-3qf67yPyqgzLnLqk5A"
+        'https://v2.cache.verto.exchange/usjm4PCxUd5mtaon7zc97-dt-3qf67yPyqgzLnLqk5A'
       )
     ).data;
     const balances = res.state.balances;

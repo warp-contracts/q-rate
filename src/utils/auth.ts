@@ -1,6 +1,6 @@
-import { browser } from "webextension-polyfill-ts";
-import { walletsStored } from "./background";
-import bcrypt from "bcryptjs";
+import { browser } from 'webextension-polyfill-ts';
+import { walletsStored } from './background';
+import bcrypt from 'bcryptjs';
 
 /**
  * Check if the password is valid
@@ -10,7 +10,7 @@ import bcrypt from "bcryptjs";
  * @returns if the password is valid
  */
 export async function checkPassword(password: string) {
-  const hash = (await browser.storage.local.get("hash"))?.hash;
+  const hash = (await browser.storage.local.get('hash'))?.hash;
   if (!hash) throw new Error();
 
   return await bcrypt.compare(password, hash);
@@ -33,12 +33,12 @@ export async function setPassword(password: string) {
  * the stores to use the new one
  */
 export async function fixupPasswords() {
-  const data = await browser.storage.local.get(["hash", "decryptionKey"]);
+  const data = await browser.storage.local.get(['hash', 'decryptionKey']);
 
   if (
     !data.hash &&
     (await walletsStored()) &&
-    typeof data.decryptionKey !== "boolean"
+    typeof data.decryptionKey !== 'boolean'
   ) {
     await browser.storage.local.set({
       decryptionKey: false,
@@ -53,5 +53,5 @@ export async function fixupPasswords() {
  */
 export async function logOut() {
   await browser.storage.local.clear();
-  browser.tabs.create({ url: browser.runtime.getURL("/welcome.html") });
+  browser.tabs.create({ url: browser.runtime.getURL('/welcome.html') });
 }

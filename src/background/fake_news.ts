@@ -1,6 +1,6 @@
-import axios from "axios";
-import { Contract } from "warp-contracts";
-import { den, fakeNewsContractId } from "../utils/constants";
+import axios from 'axios';
+import { Contract } from 'warp-contracts';
+import { den, fakeNewsContractId } from '../utils/constants';
 
 export interface ContractDispute {
   [id: string]: Dispute;
@@ -44,12 +44,12 @@ async function reportPageAsFake(
   dsptTokensAmount?: number
 ): Promise<void> {
   await contract.writeInteraction({
-    function: "createDispute",
+    function: 'createDispute',
     createDispute: {
       id: url,
       title: url,
       description: url,
-      options: ["fake", "legit"],
+      options: ['fake', 'legit'],
       expirationTimestamp: dsptExpirationTimestamp,
       ...(dsptTokensAmount
         ? {
@@ -58,7 +58,7 @@ async function reportPageAsFake(
               optionIndex: 0
             }
           }
-        : "")
+        : '')
     }
   });
 }
@@ -70,7 +70,7 @@ async function vote(
   selectedOptionIndex: number
 ): Promise<void> {
   await contract.writeInteraction({
-    function: "vote",
+    function: 'vote',
     vote: {
       id: url,
       selectedOptionIndex: selectedOptionIndex,
@@ -84,7 +84,7 @@ async function withdrawRewards(
   dsptId: string
 ): Promise<void> {
   await contract.writeInteraction({
-    function: "withdrawReward",
+    function: 'withdrawReward',
     withdrawReward: {
       id: dsptId
     }
@@ -116,8 +116,8 @@ export function getRoundedTokens(amount: number, divisibility: number): number {
 
 export async function mint(contract: Contract) {
   await contract.writeInteraction({
-    function: "mint",
-    mint: { qty: "1000000" }
+    function: 'mint',
+    mint: { qty: '1000000' }
   });
 }
 
@@ -127,7 +127,7 @@ export async function getBalance(
   divisibility: number
 ) {
   const { result } = await contract.viewState({
-    function: "balance",
+    function: 'balance',
     balance: {
       target: address
     }

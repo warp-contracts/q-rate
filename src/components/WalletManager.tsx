@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../stores/reducers";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../stores/reducers';
 import {
   removeWallet,
   renameWallet,
   signOut,
   switchProfile
-} from "../stores/actions";
-import { Modal, Tooltip, useModal, useToasts } from "@geist-ui/react";
+} from '../stores/actions';
+import { Modal, Tooltip, useModal, useToasts } from '@geist-ui/react';
 import {
   ChevronDownIcon,
   CopyIcon,
@@ -16,20 +16,20 @@ import {
   SignOutIcon,
   TrashIcon,
   VerifiedIcon
-} from "@primer/octicons-react";
-import { useColorScheme } from "use-color-scheme";
-import { QRCode } from "react-qr-svg";
-import { motion, AnimatePresence } from "framer-motion";
-import { goTo } from "react-chrome-extension-router";
-import { getVerification, Threshold } from "arverify";
-import { browser } from "webextension-polyfill-ts";
-import { formatAddress } from "../utils/url";
-import { logOut } from "../utils/auth";
-import Settings from "../views/Popup/routes/Settings";
-import copy from "copy-to-clipboard";
-import "../styles/components/Tooltip.sass";
-import toastStyles from "../styles/components/SmallToast.module.sass";
-import styles from "../styles/components/WalletManager.module.sass";
+} from '@primer/octicons-react';
+import { useColorScheme } from 'use-color-scheme';
+import { QRCode } from 'react-qr-svg';
+import { motion, AnimatePresence } from 'framer-motion';
+import { goTo } from 'react-chrome-extension-router';
+import { getVerification, Threshold } from 'arverify';
+import { browser } from 'webextension-polyfill-ts';
+import { formatAddress } from '../utils/url';
+import { logOut } from '../utils/auth';
+import Settings from '../views/Popup/routes/Settings';
+import copy from 'copy-to-clipboard';
+import '../styles/components/Tooltip.sass';
+import toastStyles from '../styles/components/SmallToast.module.sass';
+import styles from '../styles/components/WalletManager.module.sass';
 
 export default function WalletManager() {
   const profile = useSelector((state: RootState) => state.profile),
@@ -56,7 +56,7 @@ export default function WalletManager() {
   useEffect(() => {
     if (open) return;
     for (const [i, wallet] of wallets.entries()) {
-      if (wallet.name === "") {
+      if (wallet.name === '') {
         dispatch(renameWallet(wallet.address, `Account ${i + 1}`));
       }
     }
@@ -99,19 +99,19 @@ export default function WalletManager() {
   function currentWalletName() {
     const currentWallet = wallets.find(({ address }) => address === profile);
     if (currentWallet) return currentWallet.name;
-    else return "Wallet";
+    else return 'Wallet';
   }
 
   function switchWallet(address: string) {
     dispatch(switchProfile(address));
     setOpen(false);
     browser.runtime.sendMessage({
-      type: "switch_wallet_event",
-      ext: "arconnect",
+      type: 'switch_wallet_event',
+      ext: 'arconnect',
       res: true,
-      message: "",
+      message: '',
       address,
-      sender: "popup"
+      sender: 'popup'
     });
     setShowSwitch(true);
     setTimeout(() => setShowSwitch(false), 1700);
@@ -121,7 +121,7 @@ export default function WalletManager() {
     <>
       <div className={styles.CurrentWallet}>
         <h1 onClick={() => setOpen(!open)}>
-          {currentWalletName() || "• • •"}
+          {currentWalletName() || '• • •'}
           {verifiedAddresses.includes(profile) && <VerifiedIcon />}
         </h1>
         <p className={styles.Address}>
@@ -132,12 +132,12 @@ export default function WalletManager() {
           </Tooltip>
 
           <button
-            style={{ marginLeft: ".85em" }}
+            style={{ marginLeft: '.85em' }}
             onClick={() => {
               copy(profile);
               setToast({
-                text: "Copied address to clipboard",
-                type: "success"
+                text: 'Copied address to clipboard',
+                type: 'success'
               });
             }}
           >
@@ -235,7 +235,7 @@ export default function WalletManager() {
           </button>
         </p>
         <div
-          className={styles.Icon + " " + (open ? styles.Open : "")}
+          className={styles.Icon + ' ' + (open ? styles.Open : '')}
           onClick={() => setOpen(!open)}
         >
           <ChevronDownIcon />
@@ -254,7 +254,7 @@ export default function WalletManager() {
                     className={styles.Info}
                     onClick={() => switchWallet(wallet.address)}
                   >
-                    <div style={{ display: "flex", alignItems: "center" }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
                       <input
                         type="text"
                         value={wallet.name}
@@ -273,7 +273,7 @@ export default function WalletManager() {
                       {verifiedAddresses.includes(wallet.address) && (
                         <Tooltip
                           text={
-                            <p style={{ textAlign: "center", margin: "0" }}>
+                            <p style={{ textAlign: 'center', margin: '0' }}>
                               Verified on <br />
                               ArVerify
                             </p>
@@ -294,13 +294,13 @@ export default function WalletManager() {
                   </div>
                 </div>
               ))}
-              <div className={styles.Wallet + " " + styles.Options}>
+              <div className={styles.Wallet + ' ' + styles.Options}>
                 <Tooltip text="Add wallet">
                   <div
                     className={styles.Action}
                     onClick={() =>
                       browser.tabs.create({
-                        url: browser.runtime.getURL("/welcome.html")
+                        url: browser.runtime.getURL('/welcome.html')
                       })
                     }
                   >
@@ -364,15 +364,15 @@ export default function WalletManager() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.23, ease: "easeInOut" }}
+            transition={{ duration: 0.23, ease: 'easeInOut' }}
             onClick={() => setShowQRCode(false)}
           >
             <div className={styles.wrapper}>
               <QRCode
                 className={styles.QRCode}
                 value={profile}
-                bgColor={scheme === "dark" ? "#000000" : "#ffffff"}
-                fgColor={scheme === "dark" ? "#ffffff" : "#000000"}
+                bgColor={scheme === 'dark' ? '#000000' : '#ffffff'}
+                fgColor={scheme === 'dark' ? '#ffffff' : '#000000'}
               />
               <p>{profile}</p>
             </div>

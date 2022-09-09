@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   ArrowLeftIcon,
   CheckIcon,
@@ -7,7 +7,7 @@ import {
   DownloadIcon,
   PencilIcon,
   XIcon
-} from "@primer/octicons-react";
+} from '@primer/octicons-react';
 import {
   Button,
   Code,
@@ -20,17 +20,17 @@ import {
   useModal,
   useTheme,
   useToasts
-} from "@geist-ui/react";
-import { goTo } from "react-chrome-extension-router";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../stores/reducers";
-import { formatAddress, getRealURL, shortenURL } from "../../../utils/url";
-import { Currency } from "../../../stores/reducers/settings";
-import { Threshold } from "arverify";
-import { MessageType } from "../../../utils/messenger";
-import { updateIcon } from "../../../background/icon";
-import { checkPassword, setPassword } from "../../../utils/auth";
-import { browser } from "webextension-polyfill-ts";
+} from '@geist-ui/react';
+import { goTo } from 'react-chrome-extension-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../stores/reducers';
+import { formatAddress, getRealURL, shortenURL } from '../../../utils/url';
+import { Currency } from '../../../stores/reducers/settings';
+import { Threshold } from 'arverify';
+import { MessageType } from '../../../utils/messenger';
+import { updateIcon } from '../../../background/icon';
+import { checkPassword, setPassword } from '../../../utils/auth';
+import { browser } from 'webextension-polyfill-ts';
 import {
   readdAsset,
   removePermissions,
@@ -43,29 +43,29 @@ import {
   removeAllowance,
   resetAllowanceSpent,
   resetArweaveConfig
-} from "../../../stores/actions";
-import CryptoES from "crypto-es";
-import dayjs from "dayjs";
-import Home from "./Home";
-import Arweave from "arweave";
-import manifest from "../../../../public/manifest.json";
-import SubPageTopStyles from "../../../styles/components/SubPageTop.module.sass";
-import styles from "../../../styles/views/Popup/settings.module.sass";
+} from '../../../stores/actions';
+import CryptoES from 'crypto-es';
+import dayjs from 'dayjs';
+import Home from './Home';
+import Arweave from 'arweave';
+import manifest from '../../../../public/manifest.json';
+import SubPageTopStyles from '../../../styles/components/SubPageTop.module.sass';
+import styles from '../../../styles/views/Popup/settings.module.sass';
 
 export default function Settings() {
   const [setting, setCurrSetting] = useState<
-      | "events"
-      | "permissions"
-      | "currency"
-      | "psts"
-      | "sites"
-      | "arweave"
-      | "arverify"
-      | "allowances"
-      | "about"
-      | "password"
-      | "config_file"
-      | "fee"
+      | 'events'
+      | 'permissions'
+      | 'currency'
+      | 'psts'
+      | 'sites'
+      | 'arweave'
+      | 'arverify'
+      | 'allowances'
+      | 'about'
+      | 'password'
+      | 'config_file'
+      | 'fee'
     >(),
     permissions = useSelector((state: RootState) => state.permissions),
     [opened, setOpened] = useState<{ url: string; opened: boolean }[]>([]),
@@ -73,7 +73,7 @@ export default function Settings() {
     psts = useSelector((state: RootState) => state.assets),
     currentAddress = useSelector((state: RootState) => state.profile),
     blockedURLs = useSelector((state: RootState) => state.blockedSites),
-    addURLInput = useInput(""),
+    addURLInput = useInput(''),
     [events, setEvents] = useState<ArConnectEvent[]>([]),
     arweaveConfig = useSelector((state: RootState) => state.arweave),
     otherSettings = useSelector((state: RootState) => state.settings),
@@ -88,13 +88,13 @@ export default function Settings() {
     }>(),
     theme = useTheme(),
     passwords = {
-      new: useInput(""),
-      newAgain: useInput(""),
-      old: useInput("")
+      new: useInput(''),
+      newAgain: useInput(''),
+      old: useInput('')
     },
     [, setToast] = useToasts(),
     configFileModal = useModal(),
-    configPasswordInput = useInput(""),
+    configPasswordInput = useInput(''),
     [generatingConfig, setGeneratingConfig] = useState(false),
     feeMultiplier = useInput((otherSettings?.feeMultiplier || 1).toString()),
     wallets = useSelector((state: RootState) => state.wallets),
@@ -145,7 +145,7 @@ export default function Settings() {
   }
 
   function loadEvents() {
-    const evs = localStorage.getItem("arweave_events");
+    const evs = localStorage.getItem('arweave_events');
     if (!evs) return;
     setEvents(
       (JSON.parse(evs).val as ArConnectEvent[]).sort((a, b) => b.date - a.date)
@@ -154,16 +154,16 @@ export default function Settings() {
 
   function updateConfig() {
     if (
-      arweaveProtocolInput.state === "" ||
-      arweavePortInput.state === "" ||
-      arweaveHostInput.state === ""
+      arweaveProtocolInput.state === '' ||
+      arweavePortInput.state === '' ||
+      arweaveHostInput.state === ''
     )
       return;
     dispatch(
       updateArweaveConfig({
         host: arweaveHostInput.state,
         port: Number(arweavePortInput.state),
-        protocol: arweaveProtocolInput.state as "http" | "https"
+        protocol: arweaveProtocolInput.state as 'http' | 'https'
       })
     );
     setCurrSetting(undefined);
@@ -171,41 +171,41 @@ export default function Settings() {
 
   async function updatePassword() {
     if (
-      passwords.new.state === "" ||
-      passwords.newAgain.state === "" ||
-      passwords.old.state === ""
+      passwords.new.state === '' ||
+      passwords.newAgain.state === '' ||
+      passwords.old.state === ''
     ) {
-      setToast({ text: "Please fill all password fields", type: "error" });
+      setToast({ text: 'Please fill all password fields', type: 'error' });
       return;
     }
     if (passwords.new.state !== passwords.newAgain.state) {
       setToast({
-        text: "The two new passwords are not the same",
-        type: "error"
+        text: 'The two new passwords are not the same',
+        type: 'error'
       });
       return;
     }
     if (passwords.new.state.length < 5) {
-      setToast({ text: "Weak password", type: "error" });
+      setToast({ text: 'Weak password', type: 'error' });
       return;
     }
 
     try {
       const res = await checkPassword(passwords.old.state);
       if (!res)
-        return setToast({ text: "Old password is wrong", type: "error" });
+        return setToast({ text: 'Old password is wrong', type: 'error' });
 
       if (passwords.old.state === passwords.new.state)
         return setToast({
-          text: "You are already using this password",
-          type: "error"
+          text: 'You are already using this password',
+          type: 'error'
         });
 
       await setPassword(passwords.new.state);
-      setToast({ text: "Updated password", type: "success" });
+      setToast({ text: 'Updated password', type: 'success' });
       clearInputs();
     } catch {
-      setToast({ text: "Error while updating password", type: "error" });
+      setToast({ text: 'Error while updating password', type: 'error' });
     }
   }
 
@@ -221,42 +221,42 @@ export default function Settings() {
 
   async function generateConfigFile() {
     const password = configPasswordInput.state;
-    const storedData = (await browser.storage.local.get("persist:root"))?.[
-      "persist:root"
+    const storedData = (await browser.storage.local.get('persist:root'))?.[
+      'persist:root'
     ];
 
-    if (!storedData || storedData === "")
-      return setToast({ text: "Could not get stored data", type: "error" });
+    if (!storedData || storedData === '')
+      return setToast({ text: 'Could not get stored data', type: 'error' });
 
     const encrypted = CryptoES.AES.encrypt(storedData, password);
 
     // create element that downloads the virtual file
-    const el = document.createElement("a");
+    const el = document.createElement('a');
 
     el.setAttribute(
-      "href",
+      'href',
       `data:text/plain;charset=utf-8,${encodeURIComponent(
         encrypted.toString()
       )}`
     );
     el.setAttribute(
-      "download",
-      `arconnect-config-${dayjs().format("YYYY-MM-DD")}.txt`
+      'download',
+      `arconnect-config-${dayjs().format('YYYY-MM-DD')}.txt`
     );
-    el.style.display = "none";
+    el.style.display = 'none';
 
     document.body.appendChild(el);
     el.click();
     document.body.removeChild(el);
 
-    setToast({ text: "Created config", type: "success" });
+    setToast({ text: 'Created config', type: 'success' });
     configFileModal.setVisible(false);
   }
 
   function updateFeeMultiplier() {
     try {
       if (
-        feeMultiplier.state === "" ||
+        feeMultiplier.state === '' ||
         isNaN(parseFloat(feeMultiplier.state)) ||
         parseFloat(feeMultiplier.state) < 1
       )
@@ -269,32 +269,32 @@ export default function Settings() {
   }
 
   async function downloadSelectedWallet() {
-    const el = document.createElement("a");
+    const el = document.createElement('a');
     const walletJWK = wallets.find(
       ({ address }) => address === downloadWallet
     )?.keyfile;
 
     if (!walletJWK)
       return setToast({
-        text: "Error finding keyfile",
-        type: "error",
+        text: 'Error finding keyfile',
+        type: 'error',
         delay: 2000
       });
 
     el.setAttribute(
-      "href",
+      'href',
       `data:application/json;charset=utf-8,${encodeURIComponent(
         atob(walletJWK)
       )}`
     );
-    el.setAttribute("download", `arweave-keyfile-${downloadWallet}.json`);
-    el.style.display = "none";
+    el.setAttribute('download', `arweave-keyfile-${downloadWallet}.json`);
+    el.style.display = 'none';
 
     document.body.appendChild(el);
     el.click();
     document.body.removeChild(el);
 
-    setToast({ text: "Downloaded keyfile", type: "success", delay: 3000 });
+    setToast({ text: 'Downloaded keyfile', type: 'success', delay: 3000 });
     configFileModal.setVisible(false);
   }
 
@@ -313,19 +313,19 @@ export default function Settings() {
           <ArrowLeftIcon />
         </div>
         <h1>
-          {(setting === "events" && "Events") ||
-            (setting === "permissions" && "Permissions") ||
-            (setting === "password" && "Password") ||
-            (setting === "currency" && "Currency") ||
-            (setting === "psts" && "Removed PSTs") ||
-            (setting === "sites" && "Blocked Sites") ||
-            (setting === "arweave" && "Arweave Config") ||
-            (setting === "arverify" && "ArVerify Config") ||
-            (setting === "allowances" && "Allowances") ||
-            (setting === "about" && "About ArConnect") ||
-            (setting === "config_file" && "Download Config") ||
-            (setting === "fee" && "Fee multiplier") ||
-            "Settings"}
+          {(setting === 'events' && 'Events') ||
+            (setting === 'permissions' && 'Permissions') ||
+            (setting === 'password' && 'Password') ||
+            (setting === 'currency' && 'Currency') ||
+            (setting === 'psts' && 'Removed PSTs') ||
+            (setting === 'sites' && 'Blocked Sites') ||
+            (setting === 'arweave' && 'Arweave Config') ||
+            (setting === 'arverify' && 'ArVerify Config') ||
+            (setting === 'allowances' && 'Allowances') ||
+            (setting === 'about' && 'About ArConnect') ||
+            (setting === 'config_file' && 'Download Config') ||
+            (setting === 'fee' && 'Fee multiplier') ||
+            'Settings'}
         </h1>
       </div>
       <div className={styles.Settings}>
@@ -333,7 +333,7 @@ export default function Settings() {
           <>
             <div
               className={styles.Setting}
-              onClick={() => setCurrSetting("events")}
+              onClick={() => setCurrSetting('events')}
             >
               <div>
                 <h1>Events</h1>
@@ -345,7 +345,7 @@ export default function Settings() {
             </div>
             <div
               className={styles.Setting}
-              onClick={() => setCurrSetting("permissions")}
+              onClick={() => setCurrSetting('permissions')}
             >
               <div>
                 <h1>Permissions</h1>
@@ -357,7 +357,7 @@ export default function Settings() {
             </div>
             <div
               className={styles.Setting}
-              onClick={() => setCurrSetting("password")}
+              onClick={() => setCurrSetting('password')}
             >
               <div>
                 <h1>Password</h1>
@@ -369,7 +369,7 @@ export default function Settings() {
             </div>
             <div
               className={styles.Setting}
-              onClick={() => setCurrSetting("allowances")}
+              onClick={() => setCurrSetting('allowances')}
             >
               <div>
                 <h1>Allowances</h1>
@@ -381,7 +381,7 @@ export default function Settings() {
             </div>
             <div
               className={styles.Setting}
-              onClick={() => setCurrSetting("fee")}
+              onClick={() => setCurrSetting('fee')}
             >
               <div>
                 <h1>Fee multiplier</h1>
@@ -393,7 +393,7 @@ export default function Settings() {
             </div>
             <div
               className={styles.Setting}
-              onClick={() => setCurrSetting("currency")}
+              onClick={() => setCurrSetting('currency')}
             >
               <div>
                 <h1>Currency</h1>
@@ -405,7 +405,7 @@ export default function Settings() {
             </div>
             <div
               className={styles.Setting}
-              onClick={() => setCurrSetting("psts")}
+              onClick={() => setCurrSetting('psts')}
             >
               <div>
                 <h1>Removed PSTs</h1>
@@ -417,7 +417,7 @@ export default function Settings() {
             </div>
             <div
               className={styles.Setting}
-              onClick={() => setCurrSetting("sites")}
+              onClick={() => setCurrSetting('sites')}
             >
               <div>
                 <h1>Blocked Sites</h1>
@@ -429,7 +429,7 @@ export default function Settings() {
             </div>
             <div
               className={styles.Setting}
-              onClick={() => setCurrSetting("arweave")}
+              onClick={() => setCurrSetting('arweave')}
             >
               <div>
                 <h1>Arweave Config</h1>
@@ -441,7 +441,7 @@ export default function Settings() {
             </div>
             <div
               className={styles.Setting}
-              onClick={() => setCurrSetting("arverify")}
+              onClick={() => setCurrSetting('arverify')}
             >
               <div>
                 <h1>ArVerify Config</h1>
@@ -469,7 +469,7 @@ export default function Settings() {
             </div>
             <div
               className={styles.Setting}
-              onClick={() => setCurrSetting("config_file")}
+              onClick={() => setCurrSetting('config_file')}
             >
               <div>
                 <h1>Download config</h1>
@@ -481,7 +481,7 @@ export default function Settings() {
             </div>
             <div
               className={styles.Setting}
-              onClick={() => setCurrSetting("about")}
+              onClick={() => setCurrSetting('about')}
             >
               <div>
                 <h1>About</h1>
@@ -493,7 +493,7 @@ export default function Settings() {
             </div>
           </>
         )) ||
-          (setting === "permissions" && (
+          (setting === 'permissions' && (
             <>
               {(filterWithPermission().length > 0 &&
                 filterWithPermission()
@@ -505,7 +505,7 @@ export default function Settings() {
                   .map((permissionGroup, i) => (
                     <div key={i}>
                       <div
-                        className={styles.Setting + " " + styles.SubSetting}
+                        className={styles.Setting + ' ' + styles.SubSetting}
                         onClick={() => open(permissionGroup.url)}
                       >
                         <h1 title={permissionGroup.url}>
@@ -552,7 +552,7 @@ export default function Settings() {
                   ))) || <p>No permissions...</p>}
             </>
           )) ||
-          (setting === "currency" && (
+          (setting === 'currency' && (
             <div className={styles.OptionContent}>
               <Radio.Group
                 value={otherSettings.currency}
@@ -576,12 +576,12 @@ export default function Settings() {
               </Radio.Group>
             </div>
           )) ||
-          (setting === "psts" && (
+          (setting === 'psts' && (
             <>
               {(removedPSTs().length > 0 &&
                 removedPSTs().map((pst, i) => (
                   <div
-                    className={styles.Setting + " " + styles.SubSetting}
+                    className={styles.Setting + ' ' + styles.SubSetting}
                     key={i}
                   >
                     <h1>
@@ -599,24 +599,24 @@ export default function Settings() {
                 ))) || <p>No removed PSTs</p>}
             </>
           )) ||
-          (setting === "allowances" && (
+          (setting === 'allowances' && (
             <>
               {allowances.map((allowance, i) => (
                 <div
                   className={
                     styles.Setting +
-                    " " +
+                    ' ' +
                     styles.NoFlex +
-                    " " +
+                    ' ' +
                     styles.SubSetting
                   }
                   key={i}
                 >
                   <div
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between"
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
                     }}
                   >
                     <h1 title={allowance.url}>{shortenURL(allowance.url)}</h1>
@@ -631,15 +631,15 @@ export default function Settings() {
                       />
                     </p>
                   </div>
-                  <p style={{ marginBottom: ".2em", marginTop: ".25em" }}>
-                    Spent:{" "}
-                    {arweave.ar.winstonToAr((allowance.spent ?? 0).toString())}{" "}
+                  <p style={{ marginBottom: '.2em', marginTop: '.25em' }}>
+                    Spent:{' '}
+                    {arweave.ar.winstonToAr((allowance.spent ?? 0).toString())}{' '}
                     AR
                     {allowance.spent !== 0 && (
                       <span
                         style={{
-                          textDecoration: "underline",
-                          marginLeft: ".6em"
+                          textDecoration: 'underline',
+                          marginLeft: '.6em'
                         }}
                         onClick={() =>
                           dispatch(resetAllowanceSpent(allowance.url))
@@ -649,8 +649,8 @@ export default function Settings() {
                       </span>
                     )}
                   </p>
-                  <p style={{ display: "flex", alignItems: "center" }}>
-                    Limit:{" "}
+                  <p style={{ display: 'flex', alignItems: 'center' }}>
+                    Limit:{' '}
                     {(editingAllowance && editingAllowance.id === i && (
                       <input
                         className={styles.ClearInput}
@@ -665,7 +665,7 @@ export default function Settings() {
                         }
                       />
                     )) ||
-                      allowance.limit}{" "}
+                      allowance.limit}{' '}
                     AR
                     <span
                       className={styles.EditAllowance}
@@ -692,12 +692,12 @@ export default function Settings() {
               ))}
             </>
           )) ||
-          (setting === "sites" && (
+          (setting === 'sites' && (
             <>
               {blockedURLs.length > 0 &&
                 blockedURLs.map((url, i) => (
                   <div
-                    className={styles.Setting + " " + styles.SubSetting}
+                    className={styles.Setting + ' ' + styles.SubSetting}
                     key={i}
                   >
                     <h1>{url}</h1>
@@ -715,7 +715,7 @@ export default function Settings() {
                   placeholder="Enter url (site.com)..."
                 />
                 <Button
-                  style={{ width: "100%", marginTop: ".5em" }}
+                  style={{ width: '100%', marginTop: '.5em' }}
                   onClick={blockInputUrl}
                 >
                   Block url
@@ -723,14 +723,14 @@ export default function Settings() {
               </div>
             </>
           )) ||
-          (setting === "events" && (
+          (setting === 'events' && (
             <>
               {events.length > 0 && (
                 <div
-                  className={styles.Setting + " " + styles.SubSetting}
+                  className={styles.Setting + ' ' + styles.SubSetting}
                   onClick={() => {
                     localStorage.setItem(
-                      "arweave_events",
+                      'arweave_events',
                       JSON.stringify({ val: [] })
                     );
                     setEvents([]);
@@ -744,9 +744,9 @@ export default function Settings() {
                   <div
                     className={
                       styles.Setting +
-                      " " +
+                      ' ' +
                       styles.SubSetting +
-                      " " +
+                      ' ' +
                       styles.EventItem
                     }
                     key={i}
@@ -756,8 +756,8 @@ export default function Settings() {
                       <span className={styles.EventDate}>
                         {new Intl.DateTimeFormat(navigator.language, {
                           // @ts-ignore
-                          timeStyle: "medium",
-                          dateStyle: "short"
+                          timeStyle: 'medium',
+                          dateStyle: 'short'
                         }).format(event.date)}
                       </span>
                     </h1>
@@ -768,37 +768,37 @@ export default function Settings() {
                 ))) || <p>No events</p>}
             </>
           )) ||
-          (setting === "arweave" && (
+          (setting === 'arweave' && (
             <div className={styles.OptionContent}>
               <Spacer />
               <Input
                 {...arweaveHostInput.bindings}
                 placeholder="Host..."
-                type={arweaveHostInput.state === "" ? "error" : "default"}
+                type={arweaveHostInput.state === '' ? 'error' : 'default'}
               />
               <Spacer />
               <Input
                 {...arweavePortInput.bindings}
                 placeholder="Port..."
                 htmlType="number"
-                type={arweavePortInput.state === "" ? "error" : "default"}
+                type={arweavePortInput.state === '' ? 'error' : 'default'}
               />
               <Spacer />
               <Input
                 {...arweaveProtocolInput.bindings}
                 placeholder="Protocol..."
-                type={arweaveProtocolInput.state === "" ? "error" : "default"}
+                type={arweaveProtocolInput.state === '' ? 'error' : 'default'}
               />
               <Spacer />
               <Button
-                style={{ width: "100%", marginTop: ".5em" }}
+                style={{ width: '100%', marginTop: '.5em' }}
                 onClick={updateConfig}
               >
                 Set config
               </Button>
               <Spacer />
               <Button
-                style={{ width: "100%", marginTop: ".5em" }}
+                style={{ width: '100%', marginTop: '.5em' }}
                 onClick={() => {
                   dispatch(resetArweaveConfig());
                   setCurrSetting(undefined);
@@ -808,7 +808,7 @@ export default function Settings() {
               </Button>
             </div>
           )) ||
-          (setting === "arverify" && (
+          (setting === 'arverify' && (
             <div className={styles.OptionContent}>
               <h1>Threshold:</h1>
               <Radio.Group
@@ -843,8 +843,8 @@ export default function Settings() {
               </Radio.Group>
             </div>
           )) ||
-          (setting === "about" && (
-            <div className={styles.OptionContent + " " + styles.About}>
+          (setting === 'about' && (
+            <div className={styles.OptionContent + ' ' + styles.About}>
               <h1>
                 {manifest.name}
                 <sup>{manifest.version}</sup>
@@ -865,7 +865,7 @@ export default function Settings() {
                 <div className={styles.Links}>
                   <p
                     onClick={() =>
-                      browser.tabs.create({ url: "https://arconnect.io/faq" })
+                      browser.tabs.create({ url: 'https://arconnect.io/faq' })
                     }
                     style={{ color: theme.palette.success }}
                   >
@@ -873,7 +873,7 @@ export default function Settings() {
                   </p>
                   <p
                     onClick={() =>
-                      browser.tabs.create({ url: "https://arconnect.io" })
+                      browser.tabs.create({ url: 'https://arconnect.io' })
                     }
                     style={{ color: theme.palette.success }}
                   >
@@ -881,7 +881,7 @@ export default function Settings() {
                   </p>
                   <p
                     onClick={() =>
-                      browser.tabs.create({ url: "https://arconnect.io/docs" })
+                      browser.tabs.create({ url: 'https://arconnect.io/docs' })
                     }
                     style={{ color: theme.palette.success }}
                   >
@@ -890,7 +890,7 @@ export default function Settings() {
                 </div>
                 <p
                   onClick={() =>
-                    browser.tabs.create({ url: "https://th8ta.org" })
+                    browser.tabs.create({ url: 'https://th8ta.org' })
                   }
                   className={styles.Th8ta}
                 >
@@ -899,14 +899,14 @@ export default function Settings() {
               </div>
             </div>
           )) ||
-          (setting === "password" && (
+          (setting === 'password' && (
             <div className={styles.OptionContent}>
               <Spacer />
               <Input.Password
                 {...passwords.new.bindings}
                 placeholder="New password..."
                 onKeyPress={(e) => {
-                  if (e.key === "Enter") updatePassword();
+                  if (e.key === 'Enter') updatePassword();
                 }}
               />
               <Spacer />
@@ -914,7 +914,7 @@ export default function Settings() {
                 {...passwords.newAgain.bindings}
                 placeholder="New password again..."
                 onKeyPress={(e) => {
-                  if (e.key === "Enter") updatePassword();
+                  if (e.key === 'Enter') updatePassword();
                 }}
               />
               <Spacer />
@@ -922,19 +922,19 @@ export default function Settings() {
                 {...passwords.old.bindings}
                 placeholder="Old password..."
                 onKeyPress={(e) => {
-                  if (e.key === "Enter") updatePassword();
+                  if (e.key === 'Enter') updatePassword();
                 }}
               />
               <Spacer />
               <Button
-                style={{ width: "100%", marginTop: ".5em" }}
+                style={{ width: '100%', marginTop: '.5em' }}
                 onClick={updatePassword}
               >
                 Change password
               </Button>
             </div>
           )) ||
-          (setting === "fee" && (
+          (setting === 'fee' && (
             <div className={styles.OptionContent}>
               <p>
                 You can create a transaction fee multiplier here, which further
@@ -946,21 +946,21 @@ export default function Settings() {
                 {...feeMultiplier.bindings}
                 placeholder="Fee multiplier"
                 onKeyPress={(e) => {
-                  if (e.key === "Enter") updateFeeMultiplier();
+                  if (e.key === 'Enter') updateFeeMultiplier();
                 }}
               />
               <Spacer />
               <Button
-                style={{ width: "100%", marginTop: ".5em" }}
+                style={{ width: '100%', marginTop: '.5em' }}
                 onClick={updateFeeMultiplier}
               >
                 Update
               </Button>
             </div>
           )) ||
-          (setting === "config_file" && (
-            <div className={styles.OptionContent + " " + styles.ConfigFile}>
-              <p style={{ fontWeight: "bold" }}>
+          (setting === 'config_file' && (
+            <div className={styles.OptionContent + ' ' + styles.ConfigFile}>
+              <p style={{ fontWeight: 'bold' }}>
                 Please read before continuing!
               </p>
               <p>
@@ -977,11 +977,11 @@ export default function Settings() {
                 <b>
                   DO NOT SHARE THIS FILE WITH ANYONE AND DO NOT UPLOAD IT
                   ANYWHERE.
-                </b>{" "}
+                </b>{' '}
                 By doing so, you risk losing your funds.
               </p>
               <Button
-                style={{ width: "100%", marginTop: ".5em" }}
+                style={{ width: '100%', marginTop: '.5em' }}
                 onClick={() => {
                   setDownloadWallet(undefined);
                   configFileModal.setVisible(true);
@@ -1012,7 +1012,7 @@ export default function Settings() {
       </div>
       <Modal {...configFileModal.bindings}>
         <Modal.Title>
-          {downloadWallet ? "Download wallet" : "Generate config file"}
+          {downloadWallet ? 'Download wallet' : 'Generate config file'}
         </Modal.Title>
         <Modal.Content>
           <Input.Password
@@ -1020,14 +1020,14 @@ export default function Settings() {
             placeholder="Enter your password to continue..."
             width="100%"
           />
-          <p style={{ textAlign: "center", marginBottom: 0 }}>
-            <b style={{ display: "block" }}>
+          <p style={{ textAlign: 'center', marginBottom: 0 }}>
+            <b style={{ display: 'block' }}>
               DO NOT SHARE THIS FILE WITH ANYONE!
             </b>
-            It will compromise{" "}
+            It will compromise{' '}
             {downloadWallet
               ? `your wallet (${formatAddress(downloadWallet, 8)})`
-              : "all of your wallets added to ArConnect"}
+              : 'all of your wallets added to ArConnect'}
             .
           </p>
         </Modal.Content>
@@ -1040,7 +1040,7 @@ export default function Settings() {
             setGeneratingConfig(true);
 
             if (!(await checkPassword(password))) {
-              setToast({ text: "Invalid password", type: "error" });
+              setToast({ text: 'Invalid password', type: 'error' });
               setGeneratingConfig(false);
               return;
             }

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../stores/reducers";
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../stores/reducers';
 import {
   Button,
   Input,
@@ -10,33 +10,33 @@ import {
   Tooltip,
   Progress,
   useTheme
-} from "@geist-ui/react";
-import { goTo } from "react-chrome-extension-router";
-import { JWKInterface } from "arweave/node/lib/wallet";
-import { QuestionIcon, VerifiedIcon } from "@primer/octicons-react";
-import { arToFiat, getSymbol } from "../../../utils/currency";
-import { Threshold, getVerification } from "arverify";
-import { AnimatePresence, motion } from "framer-motion";
-import { checkPassword } from "../../../utils/auth";
-import manifest from "../../../../public/manifest.json";
-import Home from "./Home";
-import Arweave from "arweave";
-import axios from "axios";
-import WalletManager from "../../../components/WalletManager";
-import styles from "../../../styles/views/Popup/send.module.sass";
+} from '@geist-ui/react';
+import { goTo } from 'react-chrome-extension-router';
+import { JWKInterface } from 'arweave/node/lib/wallet';
+import { QuestionIcon, VerifiedIcon } from '@primer/octicons-react';
+import { arToFiat, getSymbol } from '../../../utils/currency';
+import { Threshold, getVerification } from 'arverify';
+import { AnimatePresence, motion } from 'framer-motion';
+import { checkPassword } from '../../../utils/auth';
+import manifest from '../../../../public/manifest.json';
+import Home from './Home';
+import Arweave from 'arweave';
+import axios from 'axios';
+import WalletManager from '../../../components/WalletManager';
+import styles from '../../../styles/views/Popup/send.module.sass';
 
 export default function Send() {
-  const targetInput = useInput(""),
-    amountInput = useInput("0"),
-    messageInput = useInput(""),
+  const targetInput = useInput(''),
+    amountInput = useInput('0'),
+    messageInput = useInput(''),
     arweaveConfig = useSelector((state: RootState) => state.arweave),
     arweave = new Arweave(arweaveConfig),
-    [fee, setFee] = useState("0"),
+    [fee, setFee] = useState('0'),
     profile = useSelector((state: RootState) => state.profile),
     currentWallet = useSelector((state: RootState) => state.wallets).find(
       ({ address }) => address === profile
     )?.keyfile,
-    [balance, setBalance] = useState("0"),
+    [balance, setBalance] = useState('0'),
     [submitted, setSubmitted] = useState(false),
     [loading, setLoading] = useState(false),
     [, setToast] = useToasts(),
@@ -48,7 +48,7 @@ export default function Send() {
     }>(),
     { arVerifyTreshold } = useSelector((state: RootState) => state.settings),
     geistTheme = useTheme(),
-    passwordInput = useInput("");
+    passwordInput = useInput('');
   let { currency, feeMultiplier } = useSelector(
     (state: RootState) => state.settings
   );
@@ -106,8 +106,8 @@ export default function Send() {
   async function send() {
     setSubmitted(true);
     if (
-      targetInput.state === "" ||
-      amountInput.state === "" ||
+      targetInput.state === '' ||
+      amountInput.state === '' ||
       Number(amountInput.state) > Number(balance) ||
       currentWallet === undefined
     )
@@ -118,7 +118,7 @@ export default function Send() {
       Number(amountInput.state) > 1 &&
       !(await checkPassword(passwordInput.state))
     )
-      return setToast({ text: "Invalid password", type: "error" });
+      return setToast({ text: 'Invalid password', type: 'error' });
 
     setLoading(true);
 
@@ -128,7 +128,7 @@ export default function Send() {
           {
             target: targetInput.state,
             quantity: arweave.ar.arToWinston(amountInput.state),
-            data: messageInput.state !== "" ? messageInput.state : undefined
+            data: messageInput.state !== '' ? messageInput.state : undefined
           },
           keyfile
         );
@@ -143,30 +143,30 @@ export default function Send() {
         transaction.reward = (parseFloat(cost) * feeMultiplier).toFixed(0);
       }
 
-      transaction.addTag("App-Name", "ArConnect");
-      transaction.addTag("App-Version", manifest.version);
-      transaction.addTag("Content-Type", "text/plain");
+      transaction.addTag('App-Name', 'ArConnect');
+      transaction.addTag('App-Version', manifest.version);
+      transaction.addTag('Content-Type', 'text/plain');
 
       await arweave.transactions.sign(transaction, keyfile);
 
       const res = await arweave.transactions.post(transaction);
 
       if (res.status === 200)
-        setToast({ text: "Sent transaction", type: "success" });
-      else throw new Error("");
+        setToast({ text: 'Sent transaction', type: 'success' });
+      else throw new Error('');
 
-      targetInput.setState("");
-      amountInput.setState("");
-      messageInput.setState("");
+      targetInput.setState('');
+      amountInput.setState('');
+      messageInput.setState('');
       setSubmitted(false);
     } catch {
-      setToast({ text: "Error sending transaction", type: "error" });
+      setToast({ text: 'Error sending transaction', type: 'error' });
     }
     setLoading(false);
   }
 
   async function checkVerification() {
-    if (targetInput.state === "") return setVerified(undefined);
+    if (targetInput.state === '') return setVerified(undefined);
 
     try {
       const verification = await getVerification(
@@ -186,19 +186,19 @@ export default function Send() {
         <div
           className={
             verified && verified.verified
-              ? styles.Amount + " " + styles.Target
-              : ""
+              ? styles.Amount + ' ' + styles.Target
+              : ''
           }
         >
           <Input
             {...targetInput.bindings}
             placeholder="Send to address..."
-            type={submitted && targetInput.state === "" ? "error" : "default"}
+            type={submitted && targetInput.state === '' ? 'error' : 'default'}
           />
           {verified && verified.verified && (
             <Tooltip
               text={
-                <p style={{ margin: 0, textAlign: "center" }}>
+                <p style={{ margin: 0, textAlign: 'center' }}>
                   Verified on <br />
                   ArVerify
                 </p>
@@ -216,7 +216,7 @@ export default function Send() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <p style={{ margin: 0, marginBottom: ".21em" }}>
+              <p style={{ margin: 0, marginBottom: '.21em' }}>
                 Trust score: {verified.percentage?.toFixed(2) ?? 0}%
               </p>
               <Progress
@@ -224,7 +224,7 @@ export default function Send() {
                 colors={{
                   30: geistTheme.palette.error,
                   80: geistTheme.palette.warning,
-                  100: "#99C507"
+                  100: '#99C507'
                 }}
               />
             </motion.div>
@@ -240,19 +240,19 @@ export default function Send() {
             min="0"
             type={
               submitted &&
-              (amountInput.state === "" ||
+              (amountInput.state === '' ||
                 Number(amountInput.state) > Number(balance))
-                ? "error"
-                : "default"
+                ? 'error'
+                : 'default'
             }
           />
           <Button
             style={{
-              paddingLeft: ".5em",
-              paddingRight: ".5em",
-              minWidth: "unset",
-              height: "2.65em",
-              lineHeight: "unset"
+              paddingLeft: '.5em',
+              paddingRight: '.5em',
+              minWidth: 'unset',
+              height: '2.65em',
+              lineHeight: 'unset'
             }}
             onClick={() =>
               amountInput.setState(
@@ -266,9 +266,9 @@ export default function Send() {
         <Spacer h={0.19} />
         <p className={styles.InputInfo}>
           <span>
-            {"~" + getSymbol(currency)}
+            {'~' + getSymbol(currency)}
             {(arPriceFiat * Number(amountInput.state)).toFixed(2)}
-            {" " + currency}
+            {' ' + currency}
           </span>
           <span>1 AR = {getSymbol(currency) + arPriceFiat.toFixed(2)}</span>
         </p>
@@ -278,12 +278,12 @@ export default function Send() {
           Arweave fee: {fee} AR
           <Tooltip
             text={
-              <p style={{ textAlign: "center", margin: "0" }}>
+              <p style={{ textAlign: 'center', margin: '0' }}>
                 Fee charged by the <br />
                 Arweave network
               </p>
             }
-            style={{ marginLeft: ".18em" }}
+            style={{ marginLeft: '.18em' }}
           >
             <QuestionIcon size={24} />
           </Tooltip>
@@ -295,14 +295,14 @@ export default function Send() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.23, ease: "easeInOut" }}
+              transition={{ duration: 0.23, ease: 'easeInOut' }}
             >
               <Input.Password
                 {...passwordInput.bindings}
                 width="100%"
                 placeholder="Enter your password..."
                 type={
-                  submitted && passwordInput.state === "" ? "error" : "default"
+                  submitted && passwordInput.state === '' ? 'error' : 'default'
                 }
               />
               <Spacer h={1} />
@@ -310,7 +310,7 @@ export default function Send() {
           )}
         </AnimatePresence>
         <Button
-          style={{ width: "100%" }}
+          style={{ width: '100%' }}
           type="success"
           onClick={send}
           loading={loading}
@@ -318,7 +318,7 @@ export default function Send() {
           Send AR
         </Button>
         <Spacer />
-        <Button style={{ width: "100%" }} onClick={() => goTo(Home)}>
+        <Button style={{ width: '100%' }} onClick={() => goTo(Home)}>
           Cancel
         </Button>
       </div>

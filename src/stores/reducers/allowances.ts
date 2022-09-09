@@ -7,11 +7,11 @@ export interface Allowance {
 
 export interface IAllowancesAction {
   type:
-    | "TOGGLE_ALLOWANCE"
-    | "SET_LIMIT"
-    | "ADD_ALLOWANCE"
-    | "REMOVE_ALLOWANCE"
-    | "RESET_ALLOWANCE";
+    | 'TOGGLE_ALLOWANCE'
+    | 'SET_LIMIT'
+    | 'ADD_ALLOWANCE'
+    | 'REMOVE_ALLOWANCE'
+    | 'RESET_ALLOWANCE';
   payload: Partial<Allowance>;
 }
 
@@ -20,7 +20,7 @@ export default function allowancesReducer(
   action: IAllowancesAction
 ): Allowance[] {
   switch (action.type) {
-    case "ADD_ALLOWANCE":
+    case 'ADD_ALLOWANCE':
       if (
         !action.payload.enabled ||
         !action.payload.limit ||
@@ -31,7 +31,7 @@ export default function allowancesReducer(
       // @ts-ignore
       return [...state, { ...action.payload, spent: 0 }];
 
-    case "SET_LIMIT":
+    case 'SET_LIMIT':
       if (!action.payload.limit || !action.payload.url) break;
       return state.map((val) => ({
         ...val,
@@ -40,14 +40,14 @@ export default function allowancesReducer(
           0.1
       }));
 
-    case "RESET_ALLOWANCE":
+    case 'RESET_ALLOWANCE':
       if (!action.payload.url) break;
       return state.map((val) => ({
         ...val,
         spent: action.payload.url === val.url ? 0 : val.spent
       }));
 
-    case "TOGGLE_ALLOWANCE":
+    case 'TOGGLE_ALLOWANCE':
       if (action.payload.enabled === undefined || !action.payload.url) break;
       return state.map((val) => ({
         ...val,
@@ -57,7 +57,7 @@ export default function allowancesReducer(
             : val.enabled) ?? true
       }));
 
-    case "REMOVE_ALLOWANCE":
+    case 'REMOVE_ALLOWANCE':
       if (!action.payload.url) break;
       return state.filter((val) => val.url !== action.payload.url);
   }

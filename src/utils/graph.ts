@@ -14,7 +14,7 @@ export function GraphOptions({
       point: { radius: 0 },
       line: {
         borderWidth: 5,
-        borderCapStyle: "round"
+        borderCapStyle: 'round'
       }
     },
     layout: {
@@ -23,7 +23,7 @@ export function GraphOptions({
       }
     },
     tooltips: {
-      mode: "index",
+      mode: 'index',
       intersect: false,
       titleFontFamily: jetbrainsMono,
       bodyFontFamily: jetbrainsMono,
@@ -31,7 +31,7 @@ export function GraphOptions({
         label: tooltipText ?? (({ value }: any) => value)
       }
     },
-    hover: { mode: "nearest", intersect: true },
+    hover: { mode: 'nearest', intersect: true },
     legend: { display: false },
     scales: {
       xAxes: [
@@ -59,7 +59,7 @@ export function GraphOptions({
 }
 
 export const GraphDataConfig = {
-  backgroundColor: "rgba(230, 152, 232, .2)",
+  backgroundColor: 'rgba(230, 152, 232, .2)',
   borderColor(context: any) {
     let gradient = context.chart.ctx.createLinearGradient(
       0,
@@ -68,8 +68,8 @@ export const GraphDataConfig = {
       context.chart.height
     );
 
-    gradient.addColorStop(0, "#E698E8");
-    gradient.addColorStop(1, "#8D5FBC");
+    gradient.addColorStop(0, '#E698E8');
+    gradient.addColorStop(1, '#8D5FBC');
 
     return gradient;
   },

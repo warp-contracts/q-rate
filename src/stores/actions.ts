@@ -1,54 +1,54 @@
-import { Asset, IAssetsAction } from "./reducers/assets";
-import { IPermissionsAction } from "./reducers/permissions";
-import { IProfileAction } from "./reducers/profile";
-import { IWalletsAction, Wallet } from "./reducers/wallets";
-import { IBlockedAction } from "./reducers/blocked_sites";
-import { IArweaveAction, IArweave } from "./reducers/arweave";
+import { Asset, IAssetsAction } from './reducers/assets';
+import { IPermissionsAction } from './reducers/permissions';
+import { IProfileAction } from './reducers/profile';
+import { IWalletsAction, Wallet } from './reducers/wallets';
+import { IBlockedAction } from './reducers/blocked_sites';
+import { IArweaveAction, IArweave } from './reducers/arweave';
 
-import { PermissionType } from "../utils/permissions";
-import { IAllowancesAction } from "./reducers/allowances";
-import { ISettings, ISettingsAction } from "./reducers/settings";
-import { IBalanceAction, Balance } from "./reducers/balances";
-import { ITabAction } from "./reducers/time_tracking";
+import { PermissionType } from '../utils/permissions';
+import { IAllowancesAction } from './reducers/allowances';
+import { ISettings, ISettingsAction } from './reducers/settings';
+import { IBalanceAction, Balance } from './reducers/balances';
+import { ITabAction } from './reducers/time_tracking';
 
 export function addWallet(wallet: Wallet): IWalletsAction {
   return {
-    type: "ADD_WALLET",
+    type: 'ADD_WALLET',
     payload: { wallet }
   };
 }
 
 export function removeWallet(address: string): IWalletsAction {
   return {
-    type: "REMOVE_WALLET",
+    type: 'REMOVE_WALLET',
     payload: { address }
   };
 }
 
 export function renameWallet(address: string, name: string): IWalletsAction {
   return {
-    type: "RENAME_WALLET",
+    type: 'RENAME_WALLET',
     payload: { address, name }
   };
 }
 
 export function setWallets(wallets: Wallet[]): IWalletsAction {
   return {
-    type: "SET_WALLETS",
+    type: 'SET_WALLETS',
     payload: { wallets }
   };
 }
 
 export function switchProfile(address: string): IProfileAction {
   return {
-    type: "SWITCH_PROFILE",
+    type: 'SWITCH_PROFILE',
     payload: { address }
   };
 }
 
 export function setAssets(address: string, assets: Asset[]): IAssetsAction {
   return {
-    type: "UPDATE_ASSETS",
+    type: 'UPDATE_ASSETS',
     payload: { address, assets }
   };
 }
@@ -58,7 +58,7 @@ export function setPermissions(
   permissions: PermissionType[]
 ): IPermissionsAction {
   return {
-    type: "SET_PERMISSIONS",
+    type: 'SET_PERMISSIONS',
     payload: { url, permissions }
   };
 }
@@ -68,49 +68,49 @@ export function removePermissions(
   permissions: PermissionType[]
 ): IPermissionsAction {
   return {
-    type: "REMOVE_PERMISSIONS",
+    type: 'REMOVE_PERMISSIONS',
     payload: { url, permissions }
   };
 }
 
 export function removeAsset(address: string, id: string): IAssetsAction {
   return {
-    type: "REMOVE_ASSETS",
+    type: 'REMOVE_ASSETS',
     payload: { address, id }
   };
 }
 
 export function readdAsset(address: string, id: string): IAssetsAction {
   return {
-    type: "READD_ASSETS",
+    type: 'READD_ASSETS',
     payload: { address, id }
   };
 }
 
 export function blockURL(url: string): IBlockedAction {
   return {
-    type: "ADD_SITE",
+    type: 'ADD_SITE',
     payload: url
   };
 }
 
 export function unblockURL(url: string): IBlockedAction {
   return {
-    type: "REMOVE_SITE",
+    type: 'REMOVE_SITE',
     payload: url
   };
 }
 
 export function updateArweaveConfig(config: IArweave): IArweaveAction {
   return {
-    type: "SET_ARWEAVE_CONFIG",
+    type: 'SET_ARWEAVE_CONFIG',
     payload: config
   };
 }
 
 export function resetArweaveConfig(): IArweaveAction {
   return {
-    type: "RESET_ARWEAVE_CONFIG"
+    type: 'RESET_ARWEAVE_CONFIG'
   };
 }
 
@@ -120,14 +120,14 @@ export function addAllowance(
   limit: number
 ): IAllowancesAction {
   return {
-    type: "ADD_ALLOWANCE",
+    type: 'ADD_ALLOWANCE',
     payload: { url, enabled, limit }
   };
 }
 
 export function removeAllowance(url: string): IAllowancesAction {
   return {
-    type: "REMOVE_ALLOWANCE",
+    type: 'REMOVE_ALLOWANCE',
     payload: { url }
   };
 }
@@ -137,7 +137,7 @@ export function toggleAllowance(
   enabled: boolean
 ): IAllowancesAction {
   return {
-    type: "TOGGLE_ALLOWANCE",
+    type: 'TOGGLE_ALLOWANCE',
     payload: { url, enabled }
   };
 }
@@ -147,14 +147,14 @@ export function setAllowanceLimit(
   limit: number
 ): IAllowancesAction {
   return {
-    type: "SET_LIMIT",
+    type: 'SET_LIMIT',
     payload: { url, limit }
   };
 }
 
 export function resetAllowanceSpent(url: string): IAllowancesAction {
   return {
-    type: "RESET_ALLOWANCE",
+    type: 'RESET_ALLOWANCE',
     payload: { url }
   };
 }
@@ -163,35 +163,35 @@ export function updateSettings(
   settingsToUpdate: Partial<ISettings>
 ): ISettingsAction {
   return {
-    type: "UPDATE_SETTINGS",
+    type: 'UPDATE_SETTINGS',
     payload: settingsToUpdate
   };
 }
 
 export function signOut() {
   return {
-    type: "USER_SIGNOUT",
+    type: 'USER_SIGNOUT',
     payload: {}
   };
 }
 
 export function setBalance(balance: Balance): IBalanceAction {
   return {
-    type: "UPDATE_BALANCE",
+    type: 'UPDATE_BALANCE',
     payload: { balance }
   };
 }
 
 export function startSession(id: string, tabId: number): ITabAction {
   return {
-    type: "START_SESSION",
+    type: 'START_SESSION',
     payload: { id, tabId }
   };
 }
 
 export function closeSession(tabId: number): ITabAction {
   return {
-    type: "CLOSE_SESSION",
+    type: 'CLOSE_SESSION',
     payload: { tabId }
   };
 }

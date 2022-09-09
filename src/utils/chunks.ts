@@ -1,11 +1,11 @@
-import Transaction, { Tag } from "arweave/web/lib/transaction";
+import Transaction, { Tag } from 'arweave/web/lib/transaction';
 
 /**
  * The chunk of the transaction signing
  */
 export interface Chunk {
   collectionID: string; // unique ID for the collection, that is the parent of this chunk
-  type: "tag" | "data";
+  type: 'tag' | 'data';
   index: number; // index of the chunk, to make sure it is not in the wrong order
   value: Uint8Array | Tag; // Uint8Array converted to number array or a tag
 }
@@ -26,7 +26,7 @@ export function splitTxToChunks(
   // create tag chunks
   const tagChunks: Chunk[] = transaction.tags.map((value, index) => ({
     collectionID,
-    type: "tag",
+    type: 'tag',
     index,
     value
   }));
@@ -40,7 +40,7 @@ export function splitTxToChunks(
 
     dataChunks.push({
       collectionID,
-      type: "data",
+      type: 'data',
       // the index has to be added to the already
       // existing indexes of the tag chunks
       index: i + (tagChunks.length - 1),

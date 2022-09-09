@@ -1,6 +1,6 @@
-import { JWKInterface } from "arweave/node/lib/wallet";
-import { getStoreData } from "../../utils/background";
-import { MessageFormat } from "../../utils/messenger";
+import { JWKInterface } from 'arweave/node/lib/wallet';
+import { getStoreData } from '../../utils/background';
+import { MessageFormat } from '../../utils/messenger';
 
 /**
  * APIs for getting the user's address / addresses
@@ -11,7 +11,7 @@ import { MessageFormat } from "../../utils/messenger";
 export const activeAddress = () =>
   new Promise<Partial<MessageFormat>>(async (resolve, _) => {
     try {
-      const address = (await getStoreData())["profile"];
+      const address = (await getStoreData())['profile'];
 
       resolve({
         res: true,
@@ -20,7 +20,7 @@ export const activeAddress = () =>
     } catch {
       resolve({
         res: false,
-        message: "Error getting current address from extension storage"
+        message: 'Error getting current address from extension storage'
       });
     }
   });
@@ -29,8 +29,8 @@ export const activeAddress = () =>
 export const publicKey = () =>
   new Promise<Partial<MessageFormat>>(async (resolve, _) => {
     try {
-      const address = (await getStoreData())["profile"];
-      const wallets = (await getStoreData())?.["wallets"];
+      const address = (await getStoreData())['profile'];
+      const wallets = (await getStoreData())?.['wallets'];
 
       if (wallets) {
         const keyfileToDecrypt = wallets.find(
@@ -47,19 +47,19 @@ export const publicKey = () =>
         } else {
           resolve({
             res: false,
-            message: "No wallets added"
+            message: 'No wallets added'
           });
         }
       } else {
         resolve({
           res: false,
-          message: "No wallets storage found"
+          message: 'No wallets storage found'
         });
       }
     } catch {
       resolve({
         res: false,
-        message: "Error getting public key of the current address"
+        message: 'Error getting public key of the current address'
       });
     }
   });
@@ -69,7 +69,7 @@ export const publicKey = () =>
 export const allAddresses = () =>
   new Promise<Partial<MessageFormat>>(async (resolve, _) => {
     try {
-      const wallets = (await getStoreData())?.["wallets"];
+      const wallets = (await getStoreData())?.['wallets'];
 
       if (wallets)
         resolve({
@@ -79,12 +79,12 @@ export const allAddresses = () =>
       else
         resolve({
           res: false,
-          message: "No wallets storage found"
+          message: 'No wallets storage found'
         });
     } catch {
       resolve({
         res: false,
-        message: "Error getting data from wallets storage"
+        message: 'Error getting data from wallets storage'
       });
     }
   });

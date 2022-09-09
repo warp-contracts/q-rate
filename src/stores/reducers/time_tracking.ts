@@ -11,7 +11,7 @@ export interface Tab {
 }
 
 export interface ITabAction {
-  type: "START_SESSION" | "CLOSE_SESSION";
+  type: 'START_SESSION' | 'CLOSE_SESSION';
   payload: {
     id?: string;
     tabId: number;

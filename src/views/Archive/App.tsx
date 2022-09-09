@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Button,
   Input,
@@ -15,7 +15,7 @@ import {
   useModal,
   useTheme,
   useToasts
-} from "@geist-ui/react";
+} from '@geist-ui/react';
 import {
   getSizeBytes,
   createArchiveTransaction,
@@ -24,44 +24,44 @@ import {
   createPublicDrive,
   sendArDriveFee,
   defaultArDriveMinimumTipAR
-} from "../../utils/archive";
-import { useColorScheme } from "use-color-scheme";
-import { run } from "ar-gql";
-import { useSelector } from "react-redux";
-import { RootState } from "../../stores/reducers";
-import { FileDirectoryIcon, LockIcon, PlusIcon } from "@primer/octicons-react";
-import { formatAddress } from "../../utils/url";
-import { checkPassword } from "../../utils/auth";
-import { JWKInterface } from "arweave/web/lib/wallet";
-import { motion, AnimatePresence } from "framer-motion";
-import { browser } from "webextension-polyfill-ts";
-import manifest from "../../../public/manifest.json";
-import axios from "axios";
-import prettyBytes from "pretty-bytes";
-import Arweave from "arweave";
-import ardriveLogoLight from "../../assets/ardrive_light.svg";
-import ardriveLogoDark from "../../assets/ardrive_dark.svg";
-import styles from "../../styles/views/Archive/view.module.sass";
+} from '../../utils/archive';
+import { useColorScheme } from 'use-color-scheme';
+import { run } from 'ar-gql';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../stores/reducers';
+import { FileDirectoryIcon, LockIcon, PlusIcon } from '@primer/octicons-react';
+import { formatAddress } from '../../utils/url';
+import { checkPassword } from '../../utils/auth';
+import { JWKInterface } from 'arweave/web/lib/wallet';
+import { motion, AnimatePresence } from 'framer-motion';
+import { browser } from 'webextension-polyfill-ts';
+import manifest from '../../../public/manifest.json';
+import axios from 'axios';
+import prettyBytes from 'pretty-bytes';
+import Arweave from 'arweave';
+import ardriveLogoLight from '../../assets/ardrive_light.svg';
+import ardriveLogoDark from '../../assets/ardrive_dark.svg';
+import styles from '../../styles/views/Archive/view.module.sass';
 import {
   getArDriveTipPercentage,
   getWinstonPriceForByteCount
-} from "../../utils/pst";
+} from '../../utils/pst';
 
 export default function App() {
   const [safeMode, setSafeMode] = useState(true),
     [archiveData, setArchiveData] = useState<{
       url: string;
       content: string;
-      type: "page" | "pdf";
+      type: 'page' | 'pdf';
     }>({
-      url: "",
-      content: "",
-      type: "page"
+      url: '',
+      content: '',
+      type: 'page'
     }),
     [previewHeight, setPreviewHeight] = useState(0),
     previewItem = useRef<HTMLIFrameElement>(),
     { scheme } = useColorScheme(),
-    [previewHTML, setPreviewHTML] = useState(""),
+    [previewHTML, setPreviewHTML] = useState(''),
     [, setToast] = useToasts(),
     [fetching, setFetching] = useState(false),
     archiveModal = useModal(),
@@ -71,18 +71,18 @@ export default function App() {
     arweave = new Arweave(arweaveConfig),
     [drives, setDrives] = useState<Drive[]>(),
     [selectedDrive, setSelectedDrive] = useState<string>(),
-    [title, setTitle] = useState(""),
+    [title, setTitle] = useState(''),
     [archiving, setArchiving] = useState(false),
-    [fee, setFee] = useState("0"),
+    [fee, setFee] = useState('0'),
     [usedAddress, setUsedAddress] = useState(profile),
     [timestamp, setTimestamp] = useState<number>(new Date().getTime()),
     [uploadStatus, setUploadStatus] = useState<{
       percentage: number;
       text: string;
     }>(),
-    passwordInput = useInput(""),
+    passwordInput = useInput(''),
     driveNameModal = useModal(),
-    driveNameInput = useInput("ArConnect Archives"),
+    driveNameInput = useInput('ArConnect Archives'),
     [creatingDrive, setCreatingDrive] = useState(false),
     theme = useTheme();
 
@@ -97,8 +97,8 @@ export default function App() {
   }, [usedAddress]);
 
   useEffect(() => {
-    if (archiveData.url === "") return;
-    if (archiveData.content !== "" && archiveData.type !== "pdf") {
+    if (archiveData.url === '') return;
+    if (archiveData.content !== '' && archiveData.type !== 'pdf') {
       render().then(() =>
         // wait a bit for it to actually load
         setTimeout(() => {
@@ -107,16 +107,16 @@ export default function App() {
           if (archivePageHeight) setPreviewHeight(archivePageHeight);
         }, 100)
       );
-    } else if (archiveData.type === "pdf") loadPdfContent();
+    } else if (archiveData.type === 'pdf') loadPdfContent();
     // eslint-disable-next-line
   }, [archiveData]);
 
   async function loadData() {
     try {
-      const lastData = await browser.storage.local.get("lastArchive");
+      const lastData = await browser.storage.local.get('lastArchive');
 
       if (!lastData || !lastData.lastArchive) return window.close();
-      if (safeMode && lastData.type !== "pdf")
+      if (safeMode && lastData.type !== 'pdf')
         setArchiveData({
           url: lastData.lastArchive.url,
           content: (
@@ -127,8 +127,8 @@ export default function App() {
       else setArchiveData(lastData.lastArchive);
       setTimestamp(new Date().getTime());
 
-      if (lastData.lastArchive.type === "pdf") {
-        const urlSplits: string[] = lastData.lastArchive.url.split("/");
+      if (lastData.lastArchive.type === 'pdf') {
+        const urlSplits: string[] = lastData.lastArchive.url.split('/');
         setTitle(urlSplits[urlSplits.length - 1]);
       }
     } catch {
@@ -138,13 +138,13 @@ export default function App() {
 
   async function loadPdfContent(): Promise<string> {
     setFetching(true);
-    let data = "";
+    let data = '';
 
     try {
       const { data }: any = await axios.get(archiveData.url);
       setPreviewHTML(data);
     } catch {
-      setToast({ text: "Error fetching PDF", type: "error" });
+      setToast({ text: 'Error fetching PDF', type: 'error' });
     }
 
     setFetching(false);
@@ -160,19 +160,19 @@ export default function App() {
     setFetching(true);
     if (!embed)
       setToast({
-        text: "Page size is larger, trying with embedded images disabled",
-        type: "warning"
+        text: 'Page size is larger, trying with embedded images disabled',
+        type: 'warning'
       });
 
     const parser = new DOMParser(),
       archiveDocument = parser.parseFromString(
         archiveData.content,
-        "text/html"
+        'text/html'
       ),
-      baseEl = document.createElement("base");
+      baseEl = document.createElement('base');
 
     // rebase for assets
-    baseEl.setAttribute("href", archiveData.url);
+    baseEl.setAttribute('href', archiveData.url);
     archiveDocument.head.appendChild(baseEl);
 
     archiveDocument.head.insertBefore(
@@ -192,7 +192,7 @@ export default function App() {
       stylesheets = archiveDocument.querySelectorAll(
         `link[rel="stylesheet"],link[rel="preload"][as="style"]`
       ),
-      imgs = archiveDocument.querySelectorAll("img"),
+      imgs = archiveDocument.querySelectorAll('img'),
       images: {
         src: string;
         content: string;
@@ -200,7 +200,7 @@ export default function App() {
       }[] = [];
 
     stylesheets.forEach((style) => {
-      const relativeLink = style.getAttribute("href") as string,
+      const relativeLink = style.getAttribute('href') as string,
         link = new URL(relativeLink, archiveData.url);
 
       fetchAssets.push(
@@ -215,66 +215,66 @@ export default function App() {
           )
           .catch(() =>
             setToast({
-              text: "A stylesheet could not be fetched",
-              type: "error"
+              text: 'A stylesheet could not be fetched',
+              type: 'error'
             })
           )
       );
     });
     imgs.forEach((img) => {
       if (embed) {
-        img.removeAttribute("sizes");
-        img.removeAttribute("srcset");
-        img.removeAttribute("data-src");
+        img.removeAttribute('sizes');
+        img.removeAttribute('srcset');
+        img.removeAttribute('data-src');
       }
 
-      const src = img.getAttribute("src") || "",
+      const src = img.getAttribute('src') || '',
         link = new URL(src, archiveData.url);
 
-      if (!embed) return img.setAttribute("src", link.href);
+      if (!embed) return img.setAttribute('src', link.href);
       fetchAssets.push(
         axios
-          .get(link.href, { responseType: "arraybuffer" })
+          .get(link.href, { responseType: 'arraybuffer' })
           .then(({ data, headers }: any) =>
             images.push({
               src: link.href,
-              content: Buffer.from(data, "binary").toString("base64"),
-              type: headers["content-type"]
+              content: Buffer.from(data, 'binary').toString('base64'),
+              type: headers['content-type']
             })
           )
           .catch(() =>
-            setToast({ text: "An image could not be fetched", type: "error" })
+            setToast({ text: 'An image could not be fetched', type: 'error' })
           )
       );
     });
-    archiveDocument.querySelectorAll("iframe").forEach((el) => el.remove());
+    archiveDocument.querySelectorAll('iframe').forEach((el) => el.remove());
     archiveDocument
-      .querySelectorAll("script,noscript")
+      .querySelectorAll('script,noscript')
       .forEach((el) => el.remove());
 
     await Promise.all(fetchAssets);
 
     stylesheets.forEach((link) => {
-      const styleEl = archiveDocument.createElement("style"),
+      const styleEl = archiveDocument.createElement('style'),
         fetchedStyle = styles.find(
-          ({ href }) => href === link.getAttribute("href")
+          ({ href }) => href === link.getAttribute('href')
         );
 
       styleEl.textContent = `/** ArConnect resource: ${fetchedStyle?.fullPath} **/\n`;
-      styleEl.textContent += fetchedStyle?.style || "";
+      styleEl.textContent += fetchedStyle?.style || '';
       link.replaceWith(styleEl);
     });
     if (embed)
       imgs.forEach((img) => {
         const originalSrc = new URL(
-            img.getAttribute("src") || "",
+            img.getAttribute('src') || '',
             archiveData.url
           ),
           fetchedSrc = images.find(({ src }) => src === originalSrc.href);
 
         if (!fetchedSrc) return;
         img.setAttribute(
-          "src",
+          'src',
           `data:${fetchedSrc.type};base64,${fetchedSrc.content}`
         );
       });
@@ -322,10 +322,10 @@ export default function App() {
       )
     ).data.transactions.edges.map(({ node: { id, tags } }) => ({
       txid: id,
-      id: tags.find(({ name }) => name === "Drive-Id")?.value ?? "",
+      id: tags.find(({ name }) => name === 'Drive-Id')?.value ?? '',
       isPrivate:
-        tags.find(({ name }) => name === "Drive-Privacy")?.value === "true",
-      arFsVersion: tags.find(({ name }) => name === "ArFS")?.value ?? ""
+        tags.find(({ name }) => name === 'Drive-Privacy')?.value === 'true',
+      arFsVersion: tags.find(({ name }) => name === 'ArFS')?.value ?? ''
     }));
 
     const loadedDrives: Drive[] = await Promise.all(
@@ -347,7 +347,7 @@ export default function App() {
       })
     );
     const cachedDrives: Drive[] =
-      (await browser.storage.local.get("cached_drives"))?.cached_drives ?? [];
+      (await browser.storage.local.get('cached_drives'))?.cached_drives ?? [];
 
     setDrives([
       ...loadedDrives,
@@ -417,8 +417,8 @@ export default function App() {
 
     if (!encryptedJWK) {
       setToast({
-        text: "Error finding encrypted keyfile for address",
-        type: "error"
+        text: 'Error finding encrypted keyfile for address',
+        type: 'error'
       });
       return undefined;
     }
@@ -428,14 +428,14 @@ export default function App() {
 
   async function archive() {
     if (!(await checkPassword(passwordInput.state)))
-      return setToast({ text: "Invalid password", type: "error" });
+      return setToast({ text: 'Invalid password', type: 'error' });
 
     setArchiving(true);
 
-    if (archiveData.type === "pdf") await loadPdfContent();
+    if (archiveData.type === 'pdf') await loadPdfContent();
 
     if (!selectedDrive) {
-      setToast({ text: "Please select a drive", type: "error" });
+      setToast({ text: 'Please select a drive', type: 'error' });
       return setArchiving(false);
     }
 
@@ -451,7 +451,7 @@ export default function App() {
         title,
         content: previewHTML,
         contentType:
-          archiveData.type === "page" ? "text/html" : "application/pdf",
+          archiveData.type === 'page' ? 'text/html' : 'application/pdf',
         timestamp,
         keyfile: useJWK
       });
@@ -474,8 +474,8 @@ export default function App() {
       await sendArDriveFee(useJWK, arPrice, arweave);
     } catch {
       setToast({
-        text: "There was an error while uploading the site",
-        type: "error"
+        text: 'There was an error while uploading the site',
+        type: 'error'
       });
       setUploadStatus(undefined);
       return setArchiving(false);
@@ -486,8 +486,8 @@ export default function App() {
     // check if the selected drive exists
     if (!driveToSave) {
       setToast({
-        text: "Site was archived, but there was an error with the selected drive",
-        type: "error"
+        text: 'Site was archived, but there was an error with the selected drive',
+        type: 'error'
       });
       setUploadStatus(undefined);
       return setArchiving(false);
@@ -497,14 +497,14 @@ export default function App() {
     try {
       const filename = `arconnect-archive-${title
         .toLowerCase()
-        .replace(/[/\\?%*:|"<>]/g, "_")
-        .replaceAll(" ", "_")}.${archiveData.type === "page" ? "html" : "pdf"}`;
+        .replace(/[/\\?%*:|"<>]/g, '_')
+        .replaceAll(' ', '_')}.${archiveData.type === 'page' ? 'html' : 'pdf'}`;
 
       const metadataTx = await createMetadataTransaction(arweave, {
         filename,
         content: previewHTML,
         contentType:
-          archiveData.type === "page" ? "text/html" : "application/pdf",
+          archiveData.type === 'page' ? 'text/html' : 'application/pdf',
         timestamp,
         dataTxId,
         driveInfo: {
@@ -526,13 +526,13 @@ export default function App() {
 
       setToast({
         text: `Archived ${archiveData.type}. It should appear in the selected drive shortly.`,
-        type: "success",
+        type: 'success',
         delay: 5500
       });
     } catch {
       setToast({
-        text: "There was an error while creating the ArDrive transaction",
-        type: "error"
+        text: 'There was an error while creating the ArDrive transaction',
+        type: 'error'
       });
     }
 
@@ -574,7 +574,7 @@ export default function App() {
 
       // cache drive
       const cachedDrives: Drive[] =
-        (await browser.storage.local.get("cached_drives"))?.cached_drives ?? [];
+        (await browser.storage.local.get('cached_drives'))?.cached_drives ?? [];
       await browser.storage.local.set({
         cached_drives: [...cachedDrives, drive]
       });
@@ -584,10 +584,10 @@ export default function App() {
       archiveModal.setVisible(true);
       setToast({
         text: `Created new public drive ${drive.name}`,
-        type: "success"
+        type: 'success'
       });
     } catch {
-      setToast({ text: "Error creating drive", type: "error" });
+      setToast({ text: 'Error creating drive', type: 'error' });
     }
 
     setUploadStatus(undefined);
@@ -598,28 +598,28 @@ export default function App() {
     <>
       <div className={styles.Head}>
         <img
-          src={scheme === "dark" ? ardriveLogoDark : ardriveLogoLight}
+          src={scheme === 'dark' ? ardriveLogoDark : ardriveLogoLight}
           alt="ArDrive"
           className={styles.ArDrive}
         />
         <Tooltip
           text={
-            <p style={{ textAlign: "center", margin: 0 }}>
-              {archiveData.type === "pdf"
-                ? "Not available for pdfs"
-                : "This removes tracking and sensitive information"}
+            <p style={{ textAlign: 'center', margin: 0 }}>
+              {archiveData.type === 'pdf'
+                ? 'Not available for pdfs'
+                : 'This removes tracking and sensitive information'}
             </p>
           }
           placement="bottomEnd"
         >
           <div
             className={styles.SafeMode}
-            style={{ opacity: archiveData.type === "pdf" ? 0.5 : 1 }}
+            style={{ opacity: archiveData.type === 'pdf' ? 0.5 : 1 }}
           >
             Safe mode
             <Toggle
               checked={safeMode}
-              disabled={archiveData.type === "pdf"}
+              disabled={archiveData.type === 'pdf'}
               initialChecked
               onChange={(val) => setSafeMode(val.target.checked)}
             />
@@ -628,7 +628,7 @@ export default function App() {
       </div>
       <Page scale={2} className={styles.Preview}>
         {fetching && <Spinner className={styles.Fetching} scale={2} />}
-        {(archiveData.type === "page" && (
+        {(archiveData.type === 'page' && (
           <iframe
             title={title}
             srcDoc={previewHTML}
@@ -644,15 +644,15 @@ export default function App() {
             sandbox
           ></iframe>
         )) || (
-          <div style={{ height: "75vh", position: "relative" }}>
+          <div style={{ height: '75vh', position: 'relative' }}>
             <h1
               style={{
                 margin: 0,
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                textAlign: "center"
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                textAlign: 'center'
               }}
             >
               No preview available for pdfs
@@ -662,9 +662,9 @@ export default function App() {
       </Page>
       <div className={styles.ActionBar}>
         <p>
-          This will archive the{" "}
-          {(archiveData.type === "page" && "site") || "pdf file"} seen in this
-          preview on Arweave using{" "}
+          This will archive the{' '}
+          {(archiveData.type === 'page' && 'site') || 'pdf file'} seen in this
+          preview on Arweave using{' '}
           <a
             href="https://ardrive.io"
             target="_blank"
@@ -674,14 +674,14 @@ export default function App() {
           </a>
           .
           <br />
-          Credits to the{" "}
+          Credits to the{' '}
           <a
             href="https://github.com/ArweaveTeam"
             target="_blank"
             rel="noopener noreferrer"
           >
             ArweaveTeam
-          </a>{" "}
+          </a>{' '}
           for the original code.
         </p>
         <Button
@@ -690,8 +690,8 @@ export default function App() {
           onClick={() => {
             if (fetching) return;
             setToast({
-              text: "This feature is still in beta",
-              type: "warning"
+              text: 'This feature is still in beta',
+              type: 'warning'
             });
             archiveModal.setVisible(true);
           }}
@@ -702,15 +702,15 @@ export default function App() {
       <Modal {...driveNameModal.bindings}>
         <Modal.Title>Create a Drive</Modal.Title>
         <Modal.Content className={styles.Modal}>
-          <p style={{ textAlign: "center" }}>
-            You don't have a public{" "}
+          <p style={{ textAlign: 'center' }}>
+            You don't have a public{' '}
             <a
               href="https://ardrive.io"
               target="_blank"
               rel="noopener noreferrer"
             >
               ArDrive
-            </a>{" "}
+            </a>{' '}
             drive yet. Please create one.
           </p>
           <h2>Drive name</h2>
@@ -725,7 +725,7 @@ export default function App() {
                 initial={{ opacity: 0, scaleY: 0.35 }}
                 animate={{ opacity: 1, scaleY: 1 }}
                 exit={{ opacity: 0, scaleY: 0.35 }}
-                transition={{ duration: 0.23, ease: "easeInOut" }}
+                transition={{ duration: 0.23, ease: 'easeInOut' }}
               >
                 <Spacer h={1} />
                 <p>{uploadStatus.text}</p>
@@ -739,7 +739,7 @@ export default function App() {
         </Modal.Action>
         <Modal.Action
           onClick={createDrive}
-          disabled={driveNameInput.state === ""}
+          disabled={driveNameInput.state === ''}
           loading={creatingDrive}
         >
           Create
@@ -756,15 +756,15 @@ export default function App() {
                   <div
                     className={
                       styles.Drive +
-                      " " +
-                      (drive.isPrivate ? styles.DisabledDrive : "") +
-                      " " +
-                      (selectedDrive === drive.id ? styles.SelectedDrive : "")
+                      ' ' +
+                      (drive.isPrivate ? styles.DisabledDrive : '') +
+                      ' ' +
+                      (selectedDrive === drive.id ? styles.SelectedDrive : '')
                     }
                     key={i}
                     title={
                       drive.isPrivate
-                        ? "You cannot save to a private drive for now..."
+                        ? 'You cannot save to a private drive for now...'
                         : undefined
                     }
                     onClick={() => setSelectedDrive(drive.id)}
@@ -783,7 +783,7 @@ export default function App() {
                     driveNameModal.setVisible(true);
                     archiveModal.setVisible(false);
                   }}
-                  style={{ justifyContent: "center" }}
+                  style={{ justifyContent: 'center' }}
                 >
                   <PlusIcon />
                   <span>Create new</span>
@@ -791,9 +791,9 @@ export default function App() {
               </>
             )) || (
               <p>
-                No drives for this address. Please create one{" "}
+                No drives for this address. Please create one{' '}
                 <span
-                  style={{ color: theme.palette.success, cursor: "pointer" }}
+                  style={{ color: theme.palette.success, cursor: 'pointer' }}
                   onClick={() => {
                     driveNameModal.setVisible(true);
                     archiveModal.setVisible(false);
@@ -807,8 +807,8 @@ export default function App() {
           <Spacer h={1} />
           <h2>Notice</h2>
           <p>
-            This will archive the{" "}
-            {(archiveData.type === "page" && "site") || "pdf file"} on Arweave
+            This will archive the{' '}
+            {(archiveData.type === 'page' && 'site') || 'pdf file'} on Arweave
             using an ArDrive public drive. You will be able to find it there,
             shortly after the transaction has been mined.
           </p>
@@ -822,7 +822,7 @@ export default function App() {
           <Select
             value={usedAddress}
             onChange={(val) => setUsedAddress(val as string)}
-            style={{ width: "100%" }}
+            style={{ width: '100%' }}
           >
             {wallets.map((wallet, i) => (
               <Select.Option key={i} value={wallet.address}>
@@ -839,8 +839,8 @@ export default function App() {
               {archiveData.url}
             </a>
           </p>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <div style={{ width: "50%" }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ width: '50%' }}>
               <h2>{upperCaseFirst(archiveData.type)} size</h2>
               <p>{prettyBytes(getSizeBytes(previewHTML))}</p>
             </div>
@@ -855,7 +855,7 @@ export default function App() {
                 initial={{ opacity: 0, scaleY: 0.35 }}
                 animate={{ opacity: 1, scaleY: 1 }}
                 exit={{ opacity: 0, scaleY: 0.35 }}
-                transition={{ duration: 0.23, ease: "easeInOut" }}
+                transition={{ duration: 0.23, ease: 'easeInOut' }}
               >
                 <p>{uploadStatus.text}</p>
                 <Progress value={uploadStatus.percentage} type="success" />
@@ -875,7 +875,7 @@ export default function App() {
         </Modal.Action>
         <Modal.Action
           onClick={archive}
-          disabled={!selectedDrive || passwordInput.state === ""}
+          disabled={!selectedDrive || passwordInput.state === ''}
           loading={archiving}
         >
           Submit

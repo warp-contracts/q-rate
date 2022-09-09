@@ -1,8 +1,8 @@
-import axios from "axios";
+import axios from 'axios';
 
 // ArDrive Profit Sharing Community Smart Contract
 const cachedContractURL =
-  "https://v2.cache.verto.exchange/-8A6RexFkpfWwuyVO98wzSFZh0d6VJuI-buTJvlwOJQ";
+  'https://v2.cache.verto.exchange/-8A6RexFkpfWwuyVO98wzSFZh0d6VJuI-buTJvlwOJQ';
 
 // Calls the ArDrive Community Smart Contract to pull the fee
 // A return value of .15 means that the retrieved tip setting is 15% of the data upload cost.
@@ -12,7 +12,7 @@ export async function getArDriveTipPercentage(): Promise<number> {
 
     const arDriveCommunityFee = res.state.settings.find(
       (setting: (string | number)[]) =>
-        setting[0].toString().toLowerCase() === "fee"
+        setting[0].toString().toLowerCase() === 'fee'
     );
     return arDriveCommunityFee ? arDriveCommunityFee[1] / 100 : 0.15;
   } catch {

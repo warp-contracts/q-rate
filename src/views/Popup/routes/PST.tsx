@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   ArrowLeftIcon,
   ArrowSwitchIcon,
   TrashIcon,
   InfoIcon,
   VerifiedIcon
-} from "@primer/octicons-react";
-import { goTo } from "react-chrome-extension-router";
-import { Asset } from "../../../stores/reducers/assets";
+} from '@primer/octicons-react';
+import { goTo } from 'react-chrome-extension-router';
+import { Asset } from '../../../stores/reducers/assets';
 import {
   Input,
   Tabs,
@@ -22,46 +22,46 @@ import {
   useTheme,
   Tooltip,
   useToasts
-} from "@geist-ui/react";
-import { useColorScheme } from "use-color-scheme";
-import { useDispatch, useSelector } from "react-redux";
-import { removeAsset } from "../../../stores/actions";
-import { RootState } from "../../../stores/reducers";
-import { JWKInterface } from "arweave/node/lib/wallet";
-import { interactWrite } from "smartweave";
-import { Line } from "react-chartjs-2";
-import { GraphDataConfig, GraphOptions } from "../../../utils/graph";
-import { AnimatePresence, motion } from "framer-motion";
-import { getVerification, Threshold } from "arverify";
-import manifest from "../../../../public/manifest.json";
-import { browser } from "webextension-polyfill-ts";
-import Arweave from "arweave";
-import Verto from "@verto/js";
-import Home from "./Home";
-import verto_logo_light from "../../../assets/verto_light.png";
-import verto_logo_dark from "../../../assets/verto_dark.png";
-import axios from "axios";
-import SubPageTopStyles from "../../../styles/components/SubPageTop.module.sass";
-import styles from "../../../styles/views/Popup/PST.module.sass";
-import { checkPassword } from "../../../utils/auth";
+} from '@geist-ui/react';
+import { useColorScheme } from 'use-color-scheme';
+import { useDispatch, useSelector } from 'react-redux';
+import { removeAsset } from '../../../stores/actions';
+import { RootState } from '../../../stores/reducers';
+import { JWKInterface } from 'arweave/node/lib/wallet';
+import { interactWrite } from 'smartweave';
+import { Line } from 'react-chartjs-2';
+import { GraphDataConfig, GraphOptions } from '../../../utils/graph';
+import { AnimatePresence, motion } from 'framer-motion';
+import { getVerification, Threshold } from 'arverify';
+import manifest from '../../../../public/manifest.json';
+import { browser } from 'webextension-polyfill-ts';
+import Arweave from 'arweave';
+import Verto from '@verto/js';
+import Home from './Home';
+import verto_logo_light from '../../../assets/verto_light.png';
+import verto_logo_dark from '../../../assets/verto_dark.png';
+import axios from 'axios';
+import SubPageTopStyles from '../../../styles/components/SubPageTop.module.sass';
+import styles from '../../../styles/views/Popup/PST.module.sass';
+import { checkPassword } from '../../../utils/auth';
 
 export default function PST({ id, name, balance, ticker }: Asset) {
   const [price, setPrices] = useState<{ prices: number[]; dates: string[] }>(),
     { scheme } = useColorScheme(),
-    tabs = useTabs("1"),
-    transferInput = useInput(""),
-    addressInput = useInput(""),
+    tabs = useTabs('1'),
+    transferInput = useInput(''),
+    addressInput = useInput(''),
     [inputState, setInputState] = useState<
-      "default" | "secondary" | "success" | "warning" | "error"
+      'default' | 'secondary' | 'success' | 'warning' | 'error'
     >(),
     [addressInputState, setAddressInputState] = useState<
-      "default" | "secondary" | "success" | "warning" | "error"
+      'default' | 'secondary' | 'success' | 'warning' | 'error'
     >(),
     [loading, setLoading] = useState(false),
     dispatch = useDispatch(),
     profile = useSelector((state: RootState) => state.profile),
     removeModal = useModal(false),
-    [description, setDescription] = useState(""),
+    [description, setDescription] = useState(''),
     [links, setLinks] = useState<string[]>([]),
     [loadingData, setLoadingData] = useState(false),
     arweaveConfig = useSelector((state: RootState) => state.arweave),
@@ -74,7 +74,7 @@ export default function PST({ id, name, balance, ticker }: Asset) {
     }>(),
     [, setToast] = useToasts(),
     { arVerifyTreshold } = useSelector((state: RootState) => state.settings),
-    passwordInput = useInput("");
+    passwordInput = useInput('');
 
   useEffect(() => {
     loadArPrice();
@@ -83,7 +83,7 @@ export default function PST({ id, name, balance, ticker }: Asset) {
   }, [id]);
 
   useEffect(() => {
-    if (tabs.state === "3")
+    if (tabs.state === '3')
       browser.tabs.create({ url: `https://verto.exchange/space/${id}` });
   }, [tabs, id]);
 
@@ -103,7 +103,7 @@ export default function PST({ id, name, balance, ticker }: Asset) {
       });
   }
 
-  const [type, setType] = useState<"community" | "collectible">("community");
+  const [type, setType] = useState<'community' | 'collectible'>('community');
 
   async function loadData() {
     setLoadingData(true);
@@ -115,22 +115,22 @@ export default function PST({ id, name, balance, ticker }: Asset) {
       if (!data) return;
       setType(
         data.state.settings && data.state.roles && data.state.votes
-          ? "community"
-          : "collectible"
+          ? 'community'
+          : 'collectible'
       );
       setDescription(
         data.state.settings?.find(
-          (entry: any) => entry[0] === "communityDescription"
+          (entry: any) => entry[0] === 'communityDescription'
         )[1] ||
           data.state.description ||
-          ""
+          ''
       );
       setLinks([
         data.state.settings?.find(
-          (entry: any) => entry[0] === "communityAppUrl"
+          (entry: any) => entry[0] === 'communityAppUrl'
         )[1],
         ...data.state.settings?.find(
-          (entry: any) => entry[0] === "communityDiscussionLinks"
+          (entry: any) => entry[0] === 'communityDiscussionLinks'
         )[1]
       ]);
     } catch {}
@@ -139,19 +139,19 @@ export default function PST({ id, name, balance, ticker }: Asset) {
 
   async function transfer() {
     if (
-      transferInput.state === "" ||
+      transferInput.state === '' ||
       Number(transferInput.state) <= 0 ||
       Number(transferInput.state) > balance
     )
-      return setInputState("error");
-    if (addressInput.state === "") return setAddressInputState("error");
+      return setInputState('error');
+    if (addressInput.state === '') return setAddressInputState('error');
     if (
       Number(transferInput.state) *
         (price ? price.prices[price.prices.length - 1] : 1) >
         1 &&
       !(await checkPassword(passwordInput.state))
     )
-      return setToast({ text: "Invalid password", type: "error" });
+      return setToast({ text: 'Invalid password', type: 'error' });
 
     setLoading(true);
 
@@ -159,9 +159,9 @@ export default function PST({ id, name, balance, ticker }: Asset) {
     try {
       const currentWallet = wallets.find(({ address }) => address === profile);
       if (currentWallet) keyfile = JSON.parse(atob(currentWallet.keyfile));
-      else throw new Error("No wallet found");
+      else throw new Error('No wallet found');
     } catch {
-      return setToast({ type: "error", text: "Could not decrypt keyfile" });
+      return setToast({ type: 'error', text: 'Could not decrypt keyfile' });
     }
 
     if (keyfile) {
@@ -173,28 +173,28 @@ export default function PST({ id, name, balance, ticker }: Asset) {
           keyfile,
           id,
           {
-            function: "transfer",
+            function: 'transfer',
             target: addressInput.state,
             qty: Number(transferInput.state)
           },
           [
-            { name: "Type", value: "Transfer" },
-            { name: "Client", value: "ArConnect" },
-            { name: "Client-Version", value: manifest.version }
+            { name: 'Type', value: 'Transfer' },
+            { name: 'Client', value: 'ArConnect' },
+            { name: 'Client-Version', value: manifest.version }
           ],
           addressInput.state.toString()
         );
-        setToast({ type: "success", text: "The transfer is now processing" });
+        setToast({ type: 'success', text: 'The transfer is now processing' });
       } catch {
         setLoading(false);
-        return setToast({ type: "error", text: "Error durring transfer" });
+        return setToast({ type: 'error', text: 'Error durring transfer' });
       }
     }
     setLoading(false);
-    transferInput.setState("");
-    addressInput.setState("");
-    setInputState("default");
-    setAddressInputState("default");
+    transferInput.setState('');
+    addressInput.setState('');
+    setInputState('default');
+    setAddressInputState('default');
   }
 
   function removePst() {
@@ -204,7 +204,7 @@ export default function PST({ id, name, balance, ticker }: Asset) {
   }
 
   async function checkVerification() {
-    if (addressInput.state === "") return setVerified(undefined);
+    if (addressInput.state === '') return setVerified(undefined);
 
     try {
       const verification = await getVerification(
@@ -232,7 +232,7 @@ export default function PST({ id, name, balance, ticker }: Asset) {
         >
           <TrashIcon />
         </button>
-        {type === "collectible" && (
+        {type === 'collectible' && (
           <img
             src={`https://arweave.net/${id}`}
             className={styles.CollectiblePreview}
@@ -242,13 +242,13 @@ export default function PST({ id, name, balance, ticker }: Asset) {
         <h1 className={styles.Balance}>
           {balance.toLocaleString()} <span>{ticker}</span>
         </h1>
-        {(type === "community" && (
+        {(type === 'community' && (
           <h2 className={styles.BalanceInAR}>
             {!price || price.prices.length === 0
-              ? "??"
+              ? '??'
               : parseFloat(
                   (balance * price.prices[price.prices.length - 1]).toFixed(4)
-                )}{" "}
+                )}{' '}
             AR
           </h2>
         )) || <Spacer h={0.32} />}
@@ -267,9 +267,9 @@ export default function PST({ id, name, balance, ticker }: Asset) {
                 {price && price.prices.length > 0 && price.dates.length > 0 && (
                   <motion.div
                     className={styles.Graph}
-                    initial={{ opacity: 0, transform: "scaleY(0)" }}
-                    animate={{ opacity: 1, transform: "scaleY(1)" }}
-                    exit={{ opacity: 0, transform: "scaleY(0)" }}
+                    initial={{ opacity: 0, transform: 'scaleY(0)' }}
+                    animate={{ opacity: 1, transform: 'scaleY(1)' }}
+                    exit={{ opacity: 0, transform: 'scaleY(0)' }}
                     transition={{ duration: 0.3 }}
                   >
                     <Line
@@ -277,7 +277,7 @@ export default function PST({ id, name, balance, ticker }: Asset) {
                         labels: price.dates,
                         datasets: [
                           {
-                            label: "AR",
+                            label: 'AR',
                             data: price.prices.map((val) => val.toFixed(4)),
                             ...GraphDataConfig
                           }
@@ -302,12 +302,12 @@ export default function PST({ id, name, balance, ticker }: Asset) {
                             onClick={() => browser.tabs.create({ url: link })}
                           >
                             {link
-                              .replace(/(https|http):\/\//, "")
-                              .replace(/\/$/, "")}
+                              .replace(/(https|http):\/\//, '')
+                              .replace(/\/$/, '')}
                           </a>
                         </li>
                       ))}
-                      {type === "community" && (
+                      {type === 'community' && (
                         <li>
                           <a
                             href={`https://community.xyz/#${id}`}
@@ -324,7 +324,7 @@ export default function PST({ id, name, balance, ticker }: Asset) {
                     </ul>
                   </>
                 )) || (
-                  <p style={{ textAlign: "center" }}>No data for this PST.</p>
+                  <p style={{ textAlign: 'center' }}>No data for this PST.</p>
                 )}
             </div>
           </Tabs.Item>
@@ -340,7 +340,7 @@ export default function PST({ id, name, balance, ticker }: Asset) {
             <div className={styles.Transfer}>
               <Spacer />
               <div
-                className={verified && verified.verified ? styles.Address : ""}
+                className={verified && verified.verified ? styles.Address : ''}
               >
                 <Input
                   {...addressInput.bindings}
@@ -350,7 +350,7 @@ export default function PST({ id, name, balance, ticker }: Asset) {
                 {verified && verified.verified && (
                   <Tooltip
                     text={
-                      <p style={{ margin: 0, textAlign: "center" }}>
+                      <p style={{ margin: 0, textAlign: 'center' }}>
                         Verified on <br />
                         ArVerify
                       </p>
@@ -368,7 +368,7 @@ export default function PST({ id, name, balance, ticker }: Asset) {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    <p style={{ margin: 0, marginBottom: ".21em" }}>
+                    <p style={{ margin: 0, marginBottom: '.21em' }}>
                       Trust score: {verified.percentage?.toFixed(2) ?? 0}%
                     </p>
                     <Progress
@@ -376,7 +376,7 @@ export default function PST({ id, name, balance, ticker }: Asset) {
                       colors={{
                         30: geistTheme.palette.error,
                         80: geistTheme.palette.warning,
-                        100: "#99C507"
+                        100: '#99C507'
                       }}
                     />
                   </motion.div>
@@ -401,7 +401,7 @@ export default function PST({ id, name, balance, ticker }: Asset) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.23, ease: "easeInOut" }}
+                    transition={{ duration: 0.23, ease: 'easeInOut' }}
                   >
                     <Input.Password
                       {...passwordInput.bindings}
@@ -412,7 +412,7 @@ export default function PST({ id, name, balance, ticker }: Asset) {
                 )}
               </AnimatePresence>
               <Button
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 onClick={transfer}
                 loading={loading}
               >
@@ -424,7 +424,7 @@ export default function PST({ id, name, balance, ticker }: Asset) {
             label={
               <>
                 <img
-                  src={scheme === "dark" ? verto_logo_dark : verto_logo_light}
+                  src={scheme === 'dark' ? verto_logo_dark : verto_logo_light}
                   alt="verto"
                   className={styles.TabItemIcon}
                 />

@@ -1,41 +1,41 @@
 // foo.spec.ts
-import { mocked } from "ts-jest/utils";
-import allowancesReducer, { IAllowancesAction } from "./allowances";
+import { mocked } from 'ts-jest/utils';
+import allowancesReducer, { IAllowancesAction } from './allowances';
 
-describe("allowances reducer", () => {
-  describe("add allowance", () => {
-    describe("invalid input", () => {
-      test("should return the initial state", () => {
+describe('allowances reducer', () => {
+  describe('add allowance', () => {
+    describe('invalid input', () => {
+      test('should return the initial state', () => {
         expect(
           allowancesReducer(undefined, {
-            type: "ADD_ALLOWANCE",
+            type: 'ADD_ALLOWANCE',
             payload: {}
           })
         ).toEqual([]);
       });
     });
-    describe("adding a disabled payload", () => {
-      test("should return the initial state", () => {
+    describe('adding a disabled payload', () => {
+      test('should return the initial state', () => {
         expect(
           allowancesReducer(undefined, {
-            type: "ADD_ALLOWANCE",
+            type: 'ADD_ALLOWANCE',
             payload: {
               enabled: false,
               limit: 10,
-              url: "http://abc.def"
+              url: 'http://abc.def'
             }
           })
         ).toEqual([]);
       });
     });
-    test("should add an initial payload", () => {
+    test('should add an initial payload', () => {
       expect(
         allowancesReducer(undefined, {
-          type: "ADD_ALLOWANCE",
+          type: 'ADD_ALLOWANCE',
           payload: {
             enabled: true,
             limit: 10,
-            url: "http://abc.def"
+            url: 'http://abc.def'
           }
         })
       ).toEqual([
@@ -43,25 +43,25 @@ describe("allowances reducer", () => {
           enabled: true,
           limit: 10,
           spent: 0,
-          url: "http://abc.def"
+          url: 'http://abc.def'
         }
       ]);
     });
-    test("should add a second payload", () => {
+    test('should add a second payload', () => {
       const initialPayload = {
         enabled: true,
         limit: 10,
         spent: 0,
-        url: "http://abc.def"
+        url: 'http://abc.def'
       };
       const secondPayload = {
         enabled: true,
         limit: 15,
         spent: 0,
-        url: "http://abc.def"
+        url: 'http://abc.def'
       };
       const newState = allowancesReducer([initialPayload], {
-        type: "ADD_ALLOWANCE",
+        type: 'ADD_ALLOWANCE',
         payload: secondPayload
       });
       expect(newState.length).toBe(2);
@@ -69,46 +69,46 @@ describe("allowances reducer", () => {
       expect(newState[1]).toEqual(secondPayload);
     });
   });
-  describe("set limit", () => {
+  describe('set limit', () => {
     const state = [
       {
         enabled: true,
         limit: 10,
         spent: 0,
-        url: "http://abc.def"
+        url: 'http://abc.def'
       }
     ];
-    test("set the limit", () => {
+    test('set the limit', () => {
       expect(
         allowancesReducer(state, {
-          type: "SET_LIMIT",
-          payload: { url: "http://abc.def", limit: 50 }
+          type: 'SET_LIMIT',
+          payload: { url: 'http://abc.def', limit: 50 }
         })
       ).toEqual([
         {
           enabled: true,
           limit: 50,
           spent: 0,
-          url: "http://abc.def"
+          url: 'http://abc.def'
         }
       ]);
     });
-    describe("invalid input", () => {
-      describe("no limit", () => {
-        test("should ignore the input", () => {
+    describe('invalid input', () => {
+      describe('no limit', () => {
+        test('should ignore the input', () => {
           expect(
             allowancesReducer(state, {
-              type: "SET_LIMIT",
-              payload: { url: "http://abc.def" }
+              type: 'SET_LIMIT',
+              payload: { url: 'http://abc.def' }
             })
           ).toEqual(state);
         });
       });
-      describe("no url", () => {
-        test("should ignore the input", () => {
+      describe('no url', () => {
+        test('should ignore the input', () => {
           expect(
             allowancesReducer(state, {
-              type: "SET_LIMIT",
+              type: 'SET_LIMIT',
               payload: { limit: 10 }
             })
           ).toEqual(state);
@@ -116,36 +116,36 @@ describe("allowances reducer", () => {
       });
     });
   });
-  describe("reset allowance", () => {
+  describe('reset allowance', () => {
     const state = [
       {
         enabled: true,
         limit: 10,
         spent: 5,
-        url: "http://abc.def"
+        url: 'http://abc.def'
       }
     ];
-    test("reset the allowance", () => {
+    test('reset the allowance', () => {
       expect(
         allowancesReducer(state, {
-          type: "RESET_ALLOWANCE",
-          payload: { url: "http://abc.def" }
+          type: 'RESET_ALLOWANCE',
+          payload: { url: 'http://abc.def' }
         })
       ).toEqual([
         {
           enabled: true,
           limit: 10,
           spent: 0,
-          url: "http://abc.def"
+          url: 'http://abc.def'
         }
       ]);
     });
-    describe("invalid input", () => {
-      describe("no url", () => {
-        test("should ignore the input", () => {
+    describe('invalid input', () => {
+      describe('no url', () => {
+        test('should ignore the input', () => {
           expect(
             allowancesReducer(state, {
-              type: "RESET_ALLOWANCE",
+              type: 'RESET_ALLOWANCE',
               payload: {}
             })
           ).toEqual(state);
@@ -153,36 +153,36 @@ describe("allowances reducer", () => {
       });
     });
   });
-  describe("toggle allowance", () => {
+  describe('toggle allowance', () => {
     const state = [
       {
         enabled: true,
         limit: 10,
         spent: 5,
-        url: "http://abc.def"
+        url: 'http://abc.def'
       }
     ];
-    test("toggle the allowance", () => {
+    test('toggle the allowance', () => {
       expect(
         allowancesReducer(state, {
-          type: "TOGGLE_ALLOWANCE",
-          payload: { url: "http://abc.def", enabled: false }
+          type: 'TOGGLE_ALLOWANCE',
+          payload: { url: 'http://abc.def', enabled: false }
         })
       ).toEqual([
         {
           enabled: false,
           limit: 10,
           spent: 5,
-          url: "http://abc.def"
+          url: 'http://abc.def'
         }
       ]);
     });
-    describe("invalid input", () => {
-      describe("no url", () => {
-        test("should ignore the input", () => {
+    describe('invalid input', () => {
+      describe('no url', () => {
+        test('should ignore the input', () => {
           expect(
             allowancesReducer(state, {
-              type: "TOGGLE_ALLOWANCE",
+              type: 'TOGGLE_ALLOWANCE',
               payload: {}
             })
           ).toEqual(state);
@@ -190,29 +190,29 @@ describe("allowances reducer", () => {
       });
     });
   });
-  describe("remove allowance", () => {
+  describe('remove allowance', () => {
     const state = [
       {
         enabled: true,
         limit: 10,
         spent: 5,
-        url: "http://abc.def"
+        url: 'http://abc.def'
       }
     ];
-    test("toggle the allowance", () => {
+    test('toggle the allowance', () => {
       expect(
         allowancesReducer(state, {
-          type: "REMOVE_ALLOWANCE",
-          payload: { url: "http://abc.def" }
+          type: 'REMOVE_ALLOWANCE',
+          payload: { url: 'http://abc.def' }
         })
       ).toEqual([]);
     });
-    describe("invalid input", () => {
-      describe("no url", () => {
-        test("should ignore the input", () => {
+    describe('invalid input', () => {
+      describe('no url', () => {
+        test('should ignore the input', () => {
           expect(
             allowancesReducer(state, {
-              type: "REMOVE_ALLOWANCE",
+              type: 'REMOVE_ALLOWANCE',
               payload: {}
             })
           ).toEqual(state);

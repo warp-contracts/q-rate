@@ -1,35 +1,35 @@
-import { comparePermissions, PermissionType } from "../utils/permissions";
-import { SignatureOptions } from "arweave/web/lib/crypto/crypto-interface";
-import { getRealURL } from "../utils/url";
-import { IArweave } from "../stores/reducers/arweave";
-import { splitTxToChunks } from "../utils/chunks";
-import { DispatchResult } from "../utils/background";
+import { comparePermissions, PermissionType } from '../utils/permissions';
+import { SignatureOptions } from 'arweave/web/lib/crypto/crypto-interface';
+import { getRealURL } from '../utils/url';
+import { IArweave } from '../stores/reducers/arweave';
+import { splitTxToChunks } from '../utils/chunks';
+import { DispatchResult } from '../utils/background';
 import {
   createOverlay,
   createCoinWithAnimation,
   callAPI
-} from "../utils/injected";
-import Transaction from "arweave/web/lib/transaction";
-import Arweave from "arweave";
+} from '../utils/injected';
+import Transaction from 'arweave/web/lib/transaction';
+import Arweave from 'arweave';
 
 /** Maximum size (in bytes) sponsored for bundles using the Bundlr Network */
 const ACCEPTED_DISPATCH_SIZE = 120 * Math.pow(10, 3);
 
 const WalletAPI = {
-  walletName: "ArConnect",
+  walletName: 'ArConnect',
   async connect(
     permissions: PermissionType[],
     appInfo: { name?: string; logo?: string } = {}
   ) {
     const requestPermissionOverlay = createOverlay(
-      "This page is requesting permission to connect to your wallet...<br />Please review them in the popup."
+      'This page is requesting permission to connect to your wallet...<br />Please review them in the popup.'
     );
 
     if (!appInfo.logo)
       appInfo.logo =
         document.head
           .querySelector(`link[rel="shortcut icon"]`)
-          ?.getAttribute("href") ?? undefined;
+          ?.getAttribute('href') ?? undefined;
 
     if (!appInfo.name)
       appInfo.name =
@@ -44,9 +44,9 @@ const WalletAPI = {
 
       document.body.appendChild(requestPermissionOverlay);
       await callAPI({
-        type: "connect",
-        ext: "arconnect",
-        sender: "api",
+        type: 'connect',
+        ext: 'arconnect',
+        sender: 'api',
         permissions,
         appInfo
       });
@@ -62,9 +62,9 @@ const WalletAPI = {
   async disconnect() {
     try {
       const data = await callAPI({
-        type: "disconnect",
-        ext: "arconnect",
-        sender: "api"
+        type: 'disconnect',
+        ext: 'arconnect',
+        sender: 'api'
       });
 
       if (!data.res) throw new Error(data.message);
@@ -75,9 +75,9 @@ const WalletAPI = {
   async getActiveAddress() {
     try {
       const data = await callAPI({
-        type: "get_active_address",
-        ext: "arconnect",
-        sender: "api"
+        type: 'get_active_address',
+        ext: 'arconnect',
+        sender: 'api'
       });
       if (!data.res) throw new Error(data.message);
 
@@ -89,9 +89,9 @@ const WalletAPI = {
   async getActivePublicKey() {
     try {
       const data = await callAPI({
-        type: "get_active_public_key",
-        ext: "arconnect",
-        sender: "api"
+        type: 'get_active_public_key',
+        ext: 'arconnect',
+        sender: 'api'
       });
       if (!data.res) throw new Error(data.message);
 
@@ -103,9 +103,9 @@ const WalletAPI = {
   async getAllAddresses() {
     try {
       const data = await callAPI({
-        type: "get_all_addresses",
-        ext: "arconnect",
-        sender: "api"
+        type: 'get_all_addresses',
+        ext: 'arconnect',
+        sender: 'api'
       });
       if (!data.res) throw new Error(data.message);
 
@@ -117,9 +117,9 @@ const WalletAPI = {
   async getWalletNames(): Promise<{ [addr: string]: string }> {
     try {
       const data = await callAPI({
-        type: "get_wallet_names",
-        ext: "arconnect",
-        sender: "api"
+        type: 'get_wallet_names',
+        ext: 'arconnect',
+        sender: 'api'
       });
       if (!data.res) throw new Error(data.message);
 
@@ -131,9 +131,9 @@ const WalletAPI = {
   async addToken(id: string): Promise<void> {
     try {
       const data = await callAPI({
-        type: "add_token",
-        ext: "arconnect",
-        sender: "api",
+        type: 'add_token',
+        ext: 'arconnect',
+        sender: 'api',
         id
       });
       if (!data.res) throw new Error(data.message);
@@ -146,9 +146,9 @@ const WalletAPI = {
     options?: SignatureOptions
   ): Promise<Transaction> {
     const arweave = new Arweave({
-      host: "arweave.net",
+      host: 'arweave.net',
       port: 443,
-      protocol: "https"
+      protocol: 'https'
     });
     // generate a unique ID for this transaction's chunks
     // since the transaction does not have an ID yet
@@ -176,7 +176,7 @@ const WalletAPI = {
       // the data and the tags). now the background script
       // will listen for incoming chunks
       const data = await callAPI({
-        type: "sign_transaction",
+        type: 'sign_transaction',
         chunkCollectionID,
         transaction: tx,
         signatureOptions: options
@@ -192,7 +192,7 @@ const WalletAPI = {
       // send data chunks
       for (const chunk of dataChunks) {
         const chunkRes = await callAPI({
-          type: "sign_transaction_chunk",
+          type: 'sign_transaction_chunk',
           chunk: chunk
         });
 
@@ -206,7 +206,7 @@ const WalletAPI = {
       // send tag chunks
       for (const chunk of tagChunks) {
         const chunkRes = await callAPI({
-          type: "sign_transaction_chunk",
+          type: 'sign_transaction_chunk',
           chunk
         });
 
@@ -222,7 +222,7 @@ const WalletAPI = {
        * and request signing
        */
       const endRes = await callAPI({
-        type: "sign_transaction_end",
+        type: 'sign_transaction_end',
         chunkCollectionID
       });
 
@@ -265,9 +265,9 @@ const WalletAPI = {
   async getPermissions(): Promise<PermissionType[]> {
     try {
       const data = await callAPI({
-        type: "get_permissions",
-        ext: "arconnect",
-        sender: "api"
+        type: 'get_permissions',
+        ext: 'arconnect',
+        sender: 'api'
       });
       if (!data.permissions) throw new Error(data.message);
       return data.permissions;
@@ -278,9 +278,9 @@ const WalletAPI = {
   async getArweaveConfig(): Promise<IArweave> {
     try {
       const data = await callAPI({
-        type: "get_arweave_config",
-        ext: "arconnect",
-        sender: "api"
+        type: 'get_arweave_config',
+        ext: 'arconnect',
+        sender: 'api'
       });
       if (!data.config) throw new Error(data.message);
       return data.config;
@@ -298,9 +298,9 @@ const WalletAPI = {
   ): Promise<Uint8Array> {
     try {
       const result = await callAPI({
-        type: "encrypt",
-        ext: "arconnect",
-        sender: "api",
+        type: 'encrypt',
+        ext: 'arconnect',
+        sender: 'api',
         data,
         options
       });
@@ -320,9 +320,9 @@ const WalletAPI = {
   ): Promise<string> {
     try {
       const result = await callAPI({
-        type: "decrypt",
-        ext: "arconnect",
-        sender: "api",
+        type: 'decrypt',
+        ext: 'arconnect',
+        sender: 'api',
         data,
         options
       });
@@ -335,9 +335,9 @@ const WalletAPI = {
   async signature(data: Uint8Array, algorithm: any): Promise<Uint8Array> {
     try {
       const result = await callAPI({
-        type: "signature",
-        ext: "arconnect",
-        sender: "api",
+        type: 'signature',
+        ext: 'arconnect',
+        sender: 'api',
         data,
         options: algorithm
       });
@@ -359,9 +359,9 @@ const WalletAPI = {
 
     try {
       const result = await callAPI({
-        type: "dispatch",
-        ext: "arconnect",
-        sender: "api",
+        type: 'dispatch',
+        ext: 'arconnect',
+        sender: 'api',
         transaction: transaction.toJSON()
       });
 
@@ -374,21 +374,21 @@ const WalletAPI = {
 };
 
 // listen to wallet switch event and dispatch it
-window.addEventListener("message", (e) => {
+window.addEventListener('message', (e) => {
   if (
     !e.data ||
     !e.data.type ||
-    e.data.type !== "switch_wallet_event_forward" ||
+    e.data.type !== 'switch_wallet_event_forward' ||
     !e.data.address
   )
     return;
   dispatchEvent(
-    new CustomEvent("walletSwitch", { detail: { address: e.data.address } })
+    new CustomEvent('walletSwitch', { detail: { address: e.data.address } })
   );
 });
 
 window.arweaveWallet = WalletAPI;
-dispatchEvent(new CustomEvent("arweaveWalletLoaded", { detail: {} }));
+dispatchEvent(new CustomEvent('arweaveWalletLoaded', { detail: {} }));
 
 declare global {
   interface Window {

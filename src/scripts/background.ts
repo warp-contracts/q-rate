@@ -1,18 +1,18 @@
-import { getRealURL } from "../utils/url";
-import { ArConnectEvent } from "../views/Popup/routes/Settings";
-import { connect, disconnect } from "../background/api/connection";
+import { getRealURL } from '../utils/url';
+import { ArConnectEvent } from '../views/Popup/routes/Settings';
+import { connect, disconnect } from '../background/api/connection';
 import {
   activeAddress,
   allAddresses,
   publicKey
-} from "../background/api/address";
-import { addToken, walletNames } from "../background/api/utility";
-import { signTransaction, dispatch } from "../background/api/transaction";
+} from '../background/api/address';
+import { addToken, walletNames } from '../background/api/utility';
+import { signTransaction, dispatch } from '../background/api/transaction';
 import {
   MessageFormat,
   MessageType,
   validateMessage
-} from "../utils/messenger";
+} from '../utils/messenger';
 import {
   checkPermissions,
   getActiveTab,
@@ -21,8 +21,8 @@ import {
   getStoreData,
   walletsStored,
   checkCommunityContract
-} from "../utils/background";
-import { decrypt, encrypt, signature } from "../background/api/encryption";
+} from '../utils/background';
+import { decrypt, encrypt, signature } from '../background/api/encryption';
 import {
   handleTabUpdate,
   handleArweaveTabOpened,
@@ -31,12 +31,12 @@ import {
   handleBrowserLostFocus,
   handleBrowserGainedFocus,
   getArweaveActiveTab
-} from "../background/tab_update";
-import { browser, Runtime } from "webextension-polyfill-ts";
-import { fixupPasswords } from "../utils/auth";
-import { SignatureOptions } from "arweave/web/lib/crypto/crypto-interface";
-import { Chunk } from "../utils/chunks";
-import Transaction, { Tag } from "arweave/web/lib/transaction";
+} from '../background/tab_update';
+import { browser, Runtime } from 'webextension-polyfill-ts';
+import { fixupPasswords } from '../utils/auth';
+import { SignatureOptions } from 'arweave/web/lib/crypto/crypto-interface';
+import { Chunk } from '../utils/chunks';
+import Transaction, { Tag } from 'arweave/web/lib/transaction';
 
 // stored transactions and their chunks
 let transactions: {
@@ -50,7 +50,7 @@ let transactions: {
 // open the welcome page
 browser.runtime.onInstalled.addListener(async () => {
   if (!(await walletsStored()))
-    browser.tabs.create({ url: browser.runtime.getURL("/welcome.html") });
+    browser.tabs.create({ url: browser.runtime.getURL('/welcome.html') });
   else await fixupPasswords();
 });
 
@@ -78,7 +78,7 @@ browser.tabs.onActivated.addListener(async (activeInfo) => {
 browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (!(await walletsStored())) return;
 
-  if (changeInfo.status === "complete") {
+  if (changeInfo.status === 'complete') {
     const txId = await checkCommunityContract(tab.url!);
     if (txId) {
       handleArweaveTabOpened(tabId, txId);
@@ -103,11 +103,11 @@ browser.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
 });
 
 browser.runtime.onConnect.addListener((connection) => {
-  if (connection.name !== "backgroundConnection") return;
+  if (connection.name !== 'backgroundConnection') return;
   connection.onMessage.addListener(async (msg, port) => {
-    if (!validateMessage(msg, { sender: "api" })) return;
+    if (!validateMessage(msg, { sender: 'api' })) return;
     const res = await handleApiCalls(msg, port);
-    connection.postMessage({ ...res, ext: "arconnect" });
+    connection.postMessage({ ...res, ext: 'arconnect' });
   });
 });
 
@@ -117,19 +117,19 @@ const handleApiCalls = async (
   port: Runtime.Port
 ): Promise<MessageFormat> => {
   try {
-    const eventsStore = localStorage.getItem("arweave_events"),
+    const eventsStore = localStorage.getItem('arweave_events'),
       events: ArConnectEvent[] = eventsStore
         ? JSON.parse(eventsStore)?.val
         : [],
       activeTab = await getActiveTab(
-        message.type === "sign_transaction" ||
-          message.type === "sign_transaction_chunk" ||
-          message.type === "sign_transaction_end" ||
+        message.type === 'sign_transaction' ||
+          message.type === 'sign_transaction_chunk' ||
+          message.type === 'sign_transaction_end' ||
           false
       ),
       tabURL = activeTab.url as string,
       faviconUrl = activeTab.favIconUrl,
-      blockedSites = (await getStoreData())?.["blockedSites"];
+      blockedSites = (await getStoreData())?.['blockedSites'];
 
     // check if site is blocked
     if (blockedSites) {
@@ -139,30 +139,30 @@ const handleApiCalls = async (
       )
         return {
           type: `${message.type}_result` as MessageType,
-          ext: "arconnect",
+          ext: 'arconnect',
           res: false,
-          message: "Site is blocked",
-          sender: "background",
+          message: 'Site is blocked',
+          sender: 'background',
           id: message.id
         };
     }
 
     // if no wallets are stored, return and open the login page
     if (!(await walletsStored())) {
-      browser.tabs.create({ url: browser.runtime.getURL("/welcome.html") });
+      browser.tabs.create({ url: browser.runtime.getURL('/welcome.html') });
       return {
-        type: "connect_result",
-        ext: "arconnect",
+        type: 'connect_result',
+        ext: 'arconnect',
         res: false,
-        message: "No wallets added",
-        sender: "background",
+        message: 'No wallets added',
+        sender: 'background',
         id: message.id
       };
     }
 
     // update events
     localStorage.setItem(
-      "arweave_events",
+      'arweave_events',
       JSON.stringify({
         val: [
           // max 100 events
@@ -174,163 +174,163 @@ const handleApiCalls = async (
 
     switch (message.type) {
       // connect to arconnect
-      case "connect":
+      case 'connect':
         return {
-          type: "connect_result",
-          ext: "arconnect",
-          sender: "background",
+          type: 'connect_result',
+          ext: 'arconnect',
+          sender: 'background',
           id: message.id,
           ...(await connect(message, tabURL, faviconUrl))
         };
 
       // disconnect from arconnect
-      case "disconnect":
+      case 'disconnect':
         return {
-          type: "disconnect_result",
-          ext: "arconnect",
-          sender: "background",
+          type: 'disconnect_result',
+          ext: 'arconnect',
+          sender: 'background',
           id: message.id,
           ...(await disconnect(tabURL))
         };
 
       // get the active/selected address
-      case "get_active_address":
-        if (!(await checkPermissions(["ACCESS_ADDRESS"], tabURL)))
+      case 'get_active_address':
+        if (!(await checkPermissions(['ACCESS_ADDRESS'], tabURL)))
           return {
-            type: "get_active_address_result",
-            ext: "arconnect",
+            type: 'get_active_address_result',
+            ext: 'arconnect',
             res: false,
             id: message.id,
             message:
-              "The site does not have the required permissions for this action",
-            sender: "background"
+              'The site does not have the required permissions for this action',
+            sender: 'background'
           };
 
         return {
-          type: "get_active_address_result",
-          ext: "arconnect",
-          sender: "background",
+          type: 'get_active_address_result',
+          ext: 'arconnect',
+          sender: 'background',
           id: message.id,
           ...(await activeAddress())
         };
 
       // get the public key of the active/selected address
-      case "get_active_public_key":
-        if (!(await checkPermissions(["ACCESS_PUBLIC_KEY"], tabURL)))
+      case 'get_active_public_key':
+        if (!(await checkPermissions(['ACCESS_PUBLIC_KEY'], tabURL)))
           return {
-            type: "get_active_public_key_result",
-            ext: "arconnect",
+            type: 'get_active_public_key_result',
+            ext: 'arconnect',
             res: false,
             id: message.id,
             message:
-              "The site does not have the required permissions for this action",
-            sender: "background"
+              'The site does not have the required permissions for this action',
+            sender: 'background'
           };
 
         return {
-          type: "get_active_public_key_result",
-          ext: "arconnect",
-          sender: "background",
+          type: 'get_active_public_key_result',
+          ext: 'arconnect',
+          sender: 'background',
           id: message.id,
           ...(await publicKey())
         };
 
       // get all addresses added to ArConnect
-      case "get_all_addresses":
-        if (!(await checkPermissions(["ACCESS_ALL_ADDRESSES"], tabURL)))
+      case 'get_all_addresses':
+        if (!(await checkPermissions(['ACCESS_ALL_ADDRESSES'], tabURL)))
           return {
-            type: "get_all_addresses_result",
-            ext: "arconnect",
+            type: 'get_all_addresses_result',
+            ext: 'arconnect',
             res: false,
             id: message.id,
             message:
-              "The site does not have the required permissions for this action",
-            sender: "background"
+              'The site does not have the required permissions for this action',
+            sender: 'background'
           };
 
         return {
-          type: "get_all_addresses_result",
-          ext: "arconnect",
-          sender: "background",
+          type: 'get_all_addresses_result',
+          ext: 'arconnect',
+          sender: 'background',
           id: message.id,
           ...(await allAddresses())
         };
 
       // get names of wallets added to ArConnect
-      case "get_wallet_names":
-        if (!(await checkPermissions(["ACCESS_ALL_ADDRESSES"], tabURL)))
+      case 'get_wallet_names':
+        if (!(await checkPermissions(['ACCESS_ALL_ADDRESSES'], tabURL)))
           return {
-            type: "get_wallet_names_result",
-            ext: "arconnect",
+            type: 'get_wallet_names_result',
+            ext: 'arconnect',
             res: false,
             id: message.id,
             message:
-              "The site does not have the required permissions for this action",
-            sender: "background"
+              'The site does not have the required permissions for this action',
+            sender: 'background'
           };
 
         return {
-          type: "get_wallet_names_result",
-          ext: "arconnect",
+          type: 'get_wallet_names_result',
+          ext: 'arconnect',
           id: message.id,
-          sender: "background",
+          sender: 'background',
           ...(await walletNames())
         };
 
       // return permissions for the current url
-      case "get_permissions":
+      case 'get_permissions':
         return {
-          type: "get_permissions_result",
-          ext: "arconnect",
+          type: 'get_permissions_result',
+          ext: 'arconnect',
           res: true,
           permissions: await getPermissions(tabURL),
           id: message.id,
-          sender: "background"
+          sender: 'background'
         };
 
       // get the user's custom arweave config
-      case "get_arweave_config":
-        if (!(await checkPermissions(["ACCESS_ARWEAVE_CONFIG"], tabURL)))
+      case 'get_arweave_config':
+        if (!(await checkPermissions(['ACCESS_ARWEAVE_CONFIG'], tabURL)))
           return {
-            type: "get_arweave_config_result",
-            ext: "arconnect",
+            type: 'get_arweave_config_result',
+            ext: 'arconnect',
             res: false,
             id: message.id,
             message:
-              "The site does not have the required permissions for this action",
-            sender: "background"
+              'The site does not have the required permissions for this action',
+            sender: 'background'
           };
 
         return {
-          type: "get_arweave_config_result",
-          ext: "arconnect",
+          type: 'get_arweave_config_result',
+          ext: 'arconnect',
           res: true,
           id: message.id,
           config: await getArweaveConfig(),
-          sender: "background"
+          sender: 'background'
         };
 
       // add a custom token
-      case "add_token":
+      case 'add_token':
         return {
-          type: "add_token_result",
-          ext: "arconnect",
-          sender: "background",
+          type: 'add_token_result',
+          ext: 'arconnect',
+          sender: 'background',
           id: message.id,
           ...(await addToken(message))
         };
 
       // sign a transaction
-      case "sign_transaction":
-        if (!(await checkPermissions(["SIGN_TRANSACTION"], tabURL)))
+      case 'sign_transaction':
+        if (!(await checkPermissions(['SIGN_TRANSACTION'], tabURL)))
           return {
-            type: "sign_transaction_result",
-            ext: "arconnect",
+            type: 'sign_transaction_result',
+            ext: 'arconnect',
             res: false,
             id: message.id,
             message:
-              "The site does not have the required permissions for this action",
-            sender: "background"
+              'The site does not have the required permissions for this action',
+            sender: 'background'
           };
 
         // Begin listening for chunks
@@ -355,15 +355,15 @@ const handleApiCalls = async (
         // tell the injected script that the background
         // script is ready to receive the chunks
         return {
-          type: "sign_transaction_result",
-          ext: "arconnect",
-          sender: "background",
+          type: 'sign_transaction_result',
+          ext: 'arconnect',
+          sender: 'background',
           id: message.id,
           res: true
         };
 
       // receive and reconstruct a chunk
-      case "sign_transaction_chunk":
+      case 'sign_transaction_chunk':
         // get the chunk from the message
         const chunk: Chunk = message.chunk;
         // find the key of the transaction that the
@@ -380,12 +380,12 @@ const handleApiCalls = async (
         // throw error if the owner tx of this chunk is not present
         if (txArrayID < 0)
           return {
-            type: "sign_transaction_chunk_result",
-            ext: "arconnect",
+            type: 'sign_transaction_chunk_result',
+            ext: 'arconnect',
             res: false,
-            message: "Invalid origin for chunk",
+            message: 'Invalid origin for chunk',
             id: message.id,
-            sender: "background"
+            sender: 'background'
           };
 
         // push valid chunk for evaluation in the future
@@ -393,14 +393,14 @@ const handleApiCalls = async (
 
         // let the injected script know that it can send the next chunk
         return {
-          type: "sign_transaction_chunk_result",
-          ext: "arconnect",
+          type: 'sign_transaction_chunk_result',
+          ext: 'arconnect',
           res: true,
           id: message.id,
-          sender: "background"
+          sender: 'background'
         };
 
-      case "sign_transaction_end":
+      case 'sign_transaction_end':
         // find the the transaction whose chunk
         // stream is ending
         // also check if the origin matches
@@ -415,12 +415,12 @@ const handleApiCalls = async (
         // throw error if the owner tx of this tx is not present
         if (!reconstructTx)
           return {
-            type: "sign_transaction_end_result",
-            ext: "arconnect",
+            type: 'sign_transaction_end_result',
+            ext: 'arconnect',
             res: false,
             id: message.id,
-            message: "Invalid origin for end request",
-            sender: "background"
+            message: 'Invalid origin for end request',
+            sender: 'background'
           };
 
         // sort the chunks by their indexes to make sure
@@ -429,14 +429,14 @@ const handleApiCalls = async (
 
         // create a Uint8Array to reconstruct the data to
         const reconstructedData = new Uint8Array(
-          parseFloat(reconstructTx.transaction.data_size ?? "0")
+          parseFloat(reconstructTx.transaction.data_size ?? '0')
         );
         let previousLength = 0;
 
         // loop through the raw chunks and reconstruct
         // the transaction fields: data and tags
         for (const chunk of reconstructTx.rawChunks) {
-          if (chunk.type === "data") {
+          if (chunk.type === 'data') {
             // handle data chunks
             // create a Uint8Array from the chunk value
             const chunkBuffer = new Uint8Array(chunk.value as Uint8Array);
@@ -446,7 +446,7 @@ const handleApiCalls = async (
             // indexes with "previousLength")
             reconstructedData.set(chunkBuffer, previousLength);
             previousLength += chunkBuffer.length; // increase the previous length by the buffer size
-          } else if (chunk.type === "tag") {
+          } else if (chunk.type === 'tag') {
             // handle tag chunks by simply pushing them
             reconstructTx.transaction.tags.push(chunk.value as Tag);
           }
@@ -473,99 +473,99 @@ const handleApiCalls = async (
         // now the tx is ready for signing, the injected
         // script can request the background script to sign
         return {
-          type: "sign_transaction_end_result",
-          ext: "arconnect",
-          sender: "background",
+          type: 'sign_transaction_end_result',
+          ext: 'arconnect',
+          sender: 'background',
           id: message.id,
           chunkCollectionID: message.chunkCollectionID,
           ...signResult
         };
 
-      case "encrypt":
-        if (!(await checkPermissions(["ENCRYPT"], tabURL)))
+      case 'encrypt':
+        if (!(await checkPermissions(['ENCRYPT'], tabURL)))
           return {
-            type: "encrypt_result",
-            ext: "arconnect",
+            type: 'encrypt_result',
+            ext: 'arconnect',
             res: false,
             id: message.id,
             message:
-              "The site does not have the required permissions for this action",
-            sender: "background"
+              'The site does not have the required permissions for this action',
+            sender: 'background'
           };
 
         return {
-          type: "encrypt_result",
-          ext: "arconnect",
-          sender: "background",
+          type: 'encrypt_result',
+          ext: 'arconnect',
+          sender: 'background',
           id: message.id,
           ...(await encrypt(message, tabURL))
         };
 
-      case "decrypt":
-        if (!(await checkPermissions(["DECRYPT"], tabURL)))
+      case 'decrypt':
+        if (!(await checkPermissions(['DECRYPT'], tabURL)))
           return {
-            type: "decrypt_result",
-            ext: "arconnect",
+            type: 'decrypt_result',
+            ext: 'arconnect',
             res: false,
             id: message.id,
             message:
-              "The site does not have the required permissions for this action",
-            sender: "background"
+              'The site does not have the required permissions for this action',
+            sender: 'background'
           };
 
         return {
-          type: "decrypt_result",
-          ext: "arconnect",
-          sender: "background",
+          type: 'decrypt_result',
+          ext: 'arconnect',
+          sender: 'background',
           id: message.id,
           ...(await decrypt(message, tabURL))
         };
 
-      case "signature":
-        if (!(await checkPermissions(["SIGNATURE"], tabURL)))
+      case 'signature':
+        if (!(await checkPermissions(['SIGNATURE'], tabURL)))
           return {
-            type: "signature_result",
-            ext: "arconnect",
+            type: 'signature_result',
+            ext: 'arconnect',
             res: false,
             id: message.id,
             message:
-              "The site does not have the required permissions for this action",
-            sender: "background"
+              'The site does not have the required permissions for this action',
+            sender: 'background'
           };
 
         return {
-          type: "signature_result",
-          ext: "arconnect",
-          sender: "background",
+          type: 'signature_result',
+          ext: 'arconnect',
+          sender: 'background',
           id: message.id,
           ...(await signature(message, tabURL))
         };
 
-      case "dispatch":
-        if (!(await checkPermissions(["DISPATCH"], tabURL)))
+      case 'dispatch':
+        if (!(await checkPermissions(['DISPATCH'], tabURL)))
           return {
-            type: "dispatch_result",
-            ext: "arconnect",
+            type: 'dispatch_result',
+            ext: 'arconnect',
             res: false,
             id: message.id,
             message:
-              "The site does not have the required permissions for this action",
-            sender: "background"
+              'The site does not have the required permissions for this action',
+            sender: 'background'
           };
 
         if (!message.transaction)
           return {
-            type: "dispatch_result",
-            ext: "arconnect",
+            type: 'dispatch_result',
+            ext: 'arconnect',
             res: false,
-            message: "No transaction to dispatch",
-            sender: "background"
+            message: 'No transaction to dispatch',
+            sender: 'background'
           };
 
         return {
-          type: "dispatch_result",
-          ext: "arconnect",
-          sender: "background",
+          type: 'dispatch_result',
+          ext: 'arconnect',
+          sender: 'background',
           id: message.id,
           ...(await dispatch(message.transaction))
         };
@@ -576,20 +576,20 @@ const handleApiCalls = async (
 
     return {
       type: `${message.type}_result` as MessageType,
-      ext: "arconnect",
+      ext: 'arconnect',
       res: false,
       id: message.id,
-      message: "Unknown error",
-      sender: "background"
+      message: 'Unknown error',
+      sender: 'background'
     };
   } catch (e) {
     return {
       type: `${message.type}_result` as MessageType,
-      ext: "arconnect",
+      ext: 'arconnect',
       res: false,
       id: message.id,
       message: `Internal error: \n${e}`,
-      sender: "background"
+      sender: 'background'
     };
   }
 };
@@ -600,21 +600,21 @@ const handleApiCalls = async (
 browser.runtime.onMessage.addListener(async (message: MessageFormat) => {
   const activeTab = await getActiveTab();
 
-  if (!validateMessage(message, { sender: "popup" })) return;
+  if (!validateMessage(message, { sender: 'popup' })) return;
   if (!(await walletsStored())) return;
 
   switch (message.type) {
-    case "archive_page":
+    case 'archive_page':
       const response: MessageFormat = await browser.tabs.sendMessage(
         activeTab.id as number,
         message
       );
       return { ...response, url: activeTab.url };
 
-    case "switch_wallet_event":
+    case 'switch_wallet_event':
       if (
         !(await checkPermissions(
-          ["ACCESS_ALL_ADDRESSES", "ACCESS_ADDRESS"],
+          ['ACCESS_ALL_ADDRESSES', 'ACCESS_ADDRESS'],
           activeTab.url as string
         ))
       )
@@ -622,7 +622,7 @@ browser.runtime.onMessage.addListener(async (message: MessageFormat) => {
 
       browser.tabs.sendMessage(activeTab.id as number, {
         ...message,
-        type: "switch_wallet_event_forward"
+        type: 'switch_wallet_event_forward'
       });
 
       break;

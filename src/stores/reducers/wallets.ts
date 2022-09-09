@@ -6,11 +6,11 @@ export interface Wallet {
 
 export interface IWalletsAction {
   type:
-    | "ADD_WALLET"
-    | "REMOVE_WALLET"
-    | "USER_SIGNOUT"
-    | "RENAME_WALLET"
-    | "SET_WALLETS";
+    | 'ADD_WALLET'
+    | 'REMOVE_WALLET'
+    | 'USER_SIGNOUT'
+    | 'RENAME_WALLET'
+    | 'SET_WALLETS';
   payload: {
     name?: string;
     wallet?: Wallet;
@@ -24,7 +24,7 @@ export default function walletsReducer(
   action: IWalletsAction
 ): Wallet[] {
   switch (action.type) {
-    case "ADD_WALLET":
+    case 'ADD_WALLET':
       if (!action.payload.wallet) break;
       if (
         state.find(({ address }) => address === action.payload.wallet?.address)
@@ -32,19 +32,19 @@ export default function walletsReducer(
         break;
       return [...state, action.payload.wallet];
 
-    case "REMOVE_WALLET":
+    case 'REMOVE_WALLET':
       if (!action.payload.address) break;
       return state.filter(({ address }) => address !== action.payload.address);
 
-    case "RENAME_WALLET":
+    case 'RENAME_WALLET':
       if (!action.payload.address || action.payload.name === undefined) break;
       return state.map((wallet) =>
         wallet.address === action.payload.address
-          ? { ...wallet, name: action.payload.name ?? "" }
+          ? { ...wallet, name: action.payload.name ?? '' }
           : wallet
       );
 
-    case "SET_WALLETS":
+    case 'SET_WALLETS':
       if (!action.payload.wallets) break;
       // remapping to make sure there's no duplication
       const newList: Wallet[] = [];
@@ -55,7 +55,7 @@ export default function walletsReducer(
 
       return newList;
 
-    case "USER_SIGNOUT":
+    case 'USER_SIGNOUT':
       return [];
   }
 

@@ -4,7 +4,7 @@ QRate is a fork of Arweave wallet - ArConnect. It adds new functionalities which
 
 ## Rules
 
-The process is simple. If you detect that a website possibly contains fake informations, you can report it as fake. The dispute has opened. Optionally - you can stake initial amount of tokens and set the timestamp. The default timestamp is set to one day from current moment. If you report a page as a fake, other wallet addresses can vote with their QRT tokens wether they agree with you or not. They can vote for **TRUE** - if they think that the news is real or **FAKE** - if they consider the news to be fake. When the dispute ends, the amount of tokens that addresses staked for the losing options are redistributed proportionally between winning address.
+The process is simple. If you detect that a website possibly contains fake informations, you can report it as fake. The dispute has opened. Optionally - you can stake initial amount of tokens and set the timestamp. The default timestamp is set to one day from current moment. From this point on, if you visit the reported website, you will see an orange warning box in the right corner claiming that page might contain fake info. If you report a page as a fake, other wallet addresses can vote with their QRT tokens wether they agree with you or not. They can vote for **TRUE** - if they think that the news is real or **FAKE** - if they consider the news to be fake. When the dispute ends, the amount of tokens that addresses staked for the losing options are redistributed proportionally between winning address. If the website has been marked as fake, the orange box will turn red with the information that the website has been indicated as fake.
 
 ## Quadratic voting
 

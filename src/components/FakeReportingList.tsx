@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Button, Input, Spacer, Tooltip } from "@geist-ui/react";
+import React, { useEffect, useState } from 'react';
+import { Button, Input, Spacer, Tooltip } from '@geist-ui/react';
 import {
   ContractDispute,
   Dispute,
   getVotesSum,
   VoteOption
-} from "../background/fake_news";
-import HelpCircle from "@geist-ui/icons/helpCircle";
+} from '../background/fake_news';
+import HelpCircle from '@geist-ui/icons/helpCircle';
 interface Props {
   contractDisputes: ContractDispute;
   value: any;
@@ -47,63 +47,63 @@ export default function FakeReportingList({
   return (
     <>
       {!Object.keys(contractDisputes).length && (
-        <div style={{ padding: "1rem 0" }}>No reports in this category.</div>
+        <div style={{ padding: '1rem 0' }}>No reports in this category.</div>
       )}
       {contractDisputeSorted &&
         contractDisputeSorted.map((dispute: any, disputeIdx: number) => (
           <div
             style={{
-              padding: "10px",
-              borderRadius: "5px",
-              marginBottom: "10px",
-              color: "gray",
-              fontSize: "14px",
-              border: "1px solid #a99eec",
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              maxWidth: "100%"
+              padding: '10px',
+              borderRadius: '5px',
+              marginBottom: '10px',
+              color: 'gray',
+              fontSize: '14px',
+              border: '1px solid #a99eec',
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              maxWidth: '100%'
             }}
           >
-            <a href={dispute[0]} target="_blank" style={{ fontWeight: "bold" }}>
+            <a href={dispute[0]} target="_blank" style={{ fontWeight: 'bold' }}>
               {dispute[0]}
             </a>
             {dispute[1].votes.map((v: VoteOption, idx: number) => (
               <div>
                 <hr />
 
-                <div style={{ display: "flex" }}>
+                <div style={{ display: 'flex' }}>
                   <div
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      marginBottom: "10px",
-                      marginRight: "0.5rem",
-                      width: "45%"
+                      display: 'flex',
+                      alignItems: 'center',
+                      marginBottom: '10px',
+                      marginRight: '0.5rem',
+                      width: '45%'
                     }}
                   >
-                    <span style={{ textTransform: "uppercase" }}>
+                    <span style={{ textTransform: 'uppercase' }}>
                       {v.label}
                     </span>
-                    :{" "}
+                    :{' '}
                     <div
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginLeft: "auto"
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginLeft: 'auto'
                       }}
                     >
-                      <strong style={{ marginLeft: "0.25rem" }}>
+                      <strong style={{ marginLeft: '0.25rem' }}>
                         {getVotesSum(v.votes, divisibility)}
                       </strong>
-                      <div style={{ marginTop: "0.3rem" }}>
+                      <div style={{ marginTop: '0.3rem' }}>
                         <Tooltip
                           placement="topStart"
                           text={
                             <>
                               Votes are calculated according to the <br />
                               quadratic voting procedure. <br /> You can read
-                              about it{" "}
+                              about it{' '}
                               <a
                                 href="https://towardsdatascience.com/what-is-quadratic-voting-4f81805d5a06"
                                 target="_blank"
@@ -122,12 +122,12 @@ export default function FakeReportingList({
                   </div>
                   {
                     <>
-                      <div style={{ marginBottom: "10px" }}>
+                      <div style={{ marginBottom: '10px' }}>
                         <Input
                           value={
                             value[2 * disputeIdx + idx]
                               ? value[2 * disputeIdx + idx]
-                              : ""
+                              : ''
                           }
                           onChange={(e) => handler(e, disputeIdx, idx)}
                           placeholder={`Amount`}
@@ -144,12 +144,12 @@ export default function FakeReportingList({
                   }
                   <Button
                     style={{
-                      minWidth: "auto",
-                      width: "90px",
-                      lineHeight: "inherit",
-                      height: "calc(2.5 * 14px)",
-                      marginBottom: "10px",
-                      marginLeft: "0.5rem"
+                      minWidth: 'auto',
+                      width: '90px',
+                      lineHeight: 'inherit',
+                      height: 'calc(2.5 * 14px)',
+                      marginBottom: '10px',
+                      marginLeft: '0.5rem'
                     }}
                     type="success"
                     disabled={
@@ -176,14 +176,14 @@ export default function FakeReportingList({
             ))}
             <div
               style={{
-                textAlign: "center"
+                textAlign: 'center'
               }}
             >
-              <div style={{ padding: "0.5rem" }}>
+              <div style={{ padding: '0.5rem' }}>
                 <span>Expiration time: </span>
-                <strong style={{ marginLeft: "0.25rem" }}>
+                <strong style={{ marginLeft: '0.25rem' }}>
                   {dispute[1].expirationTimestamp - currentTimestamp < 0
-                    ? "Expired"
+                    ? 'Expired'
                     : dispute[1].expirationTimestamp.length == 13
                     ? new Date(
                         parseInt(dispute[1].expirationTimestamp)
@@ -196,7 +196,7 @@ export default function FakeReportingList({
 
               {
                 <Button
-                  style={{ minWidth: "auto", marginBottom: "10px" }}
+                  style={{ minWidth: 'auto', marginBottom: '10px' }}
                   type="success"
                   disabled={
                     dispute[1].expirationTimestamp - currentTimestamp > 0

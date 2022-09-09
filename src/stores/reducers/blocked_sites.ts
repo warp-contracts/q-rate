@@ -1,5 +1,5 @@
 export interface IBlockedAction {
-  type: "ADD_SITE" | "REMOVE_SITE";
+  type: 'ADD_SITE' | 'REMOVE_SITE';
   payload: string;
 }
 
@@ -8,10 +8,10 @@ export default function blockedSitesReducer(
   action: IBlockedAction
 ): string[] {
   switch (action.type) {
-    case "ADD_SITE":
+    case 'ADD_SITE':
       return [...state, action.payload];
 
-    case "REMOVE_SITE":
+    case 'REMOVE_SITE':
       return state.filter((url) => url !== action.payload);
   }
 

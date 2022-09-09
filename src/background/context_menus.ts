@@ -1,7 +1,7 @@
-import { IPermissionState } from "../stores/reducers/permissions";
-import { getStoreData, setStoreData, walletsStored } from "../utils/background";
-import { getRealURL } from "../utils/url";
-import { browser } from "webextension-polyfill-ts";
+import { IPermissionState } from '../stores/reducers/permissions';
+import { getStoreData, setStoreData, walletsStored } from '../utils/background';
+import { getRealURL } from '../utils/url';
+import { browser } from 'webextension-polyfill-ts';
 
 /**
  * Create context menus (right click actions)
@@ -15,20 +15,20 @@ export async function createContextMenus(hasPerms: boolean) {
   // a "copy current address" context menu
   if (await walletsStored()) {
     browser.contextMenus.create({
-      title: "Copy current address",
-      contexts: ["browser_action"],
+      title: 'Copy current address',
+      contexts: ['browser_action'],
       async onclick() {
         try {
-          const input = document.createElement("input"),
+          const input = document.createElement('input'),
             profile = (await getStoreData())?.profile;
 
-          if (!profile || profile === "") return;
+          if (!profile || profile === '') return;
 
           input.value = profile;
 
           document.body.appendChild(input);
           input.select();
-          document.execCommand("Copy");
+          document.execCommand('Copy');
           document.body.removeChild(input);
         } catch {}
       }
@@ -40,8 +40,8 @@ export async function createContextMenus(hasPerms: boolean) {
   // context menu
   if (hasPerms) {
     browser.contextMenus.create({
-      title: "Disconnect from current site",
-      contexts: ["browser_action", "page"],
+      title: 'Disconnect from current site',
+      contexts: ['browser_action', 'page'],
       async onclick(_, tab) {
         try {
           const store = await getStoreData(),
@@ -62,7 +62,7 @@ export async function createContextMenus(hasPerms: boolean) {
 
           // reload tab
           browser.tabs.executeScript(id, {
-            code: "window.location.reload()"
+            code: 'window.location.reload()'
           });
         } catch {}
       }

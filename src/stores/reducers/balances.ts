@@ -1,7 +1,7 @@
-import { Wallet } from "./wallets";
+import { Wallet } from './wallets';
 
 export interface IBalanceAction {
-  type: "ADD_WALLET" | "REMOVE_WALLET" | "UPDATE_BALANCE";
+  type: 'ADD_WALLET' | 'REMOVE_WALLET' | 'UPDATE_BALANCE';
   payload: {
     address?: string;
     wallet?: Wallet;
@@ -20,18 +20,18 @@ export default function balancesReducer(
   action: IBalanceAction
 ): Balance[] {
   switch (action.type) {
-    case "ADD_WALLET":
+    case 'ADD_WALLET':
       if (!action.payload.wallet || !action.payload.wallet.address) break;
       return [
         ...state,
         { address: action.payload.wallet.address, arBalance: 0, fiatBalance: 0 }
       ];
 
-    case "REMOVE_WALLET":
+    case 'REMOVE_WALLET':
       if (!action.payload.address) break;
       return state.filter(({ address }) => address !== action.payload.address);
 
-    case "UPDATE_BALANCE":
+    case 'UPDATE_BALANCE':
       if (!action.payload.balance) break;
       return [
         ...state.filter(

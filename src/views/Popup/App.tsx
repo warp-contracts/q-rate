@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { Router } from "react-chrome-extension-router";
-import { useSelector } from "react-redux";
-import { useTheme } from "@geist-ui/react";
-import { browser } from "webextension-polyfill-ts";
-import { RootState } from "../../stores/reducers";
+import React, { useEffect, useState } from 'react';
+import { Router } from 'react-chrome-extension-router';
+import { useSelector } from 'react-redux';
+import { useTheme } from '@geist-ui/react';
+import { browser } from 'webextension-polyfill-ts';
+import { RootState } from '../../stores/reducers';
 
-import Home from "./routes/Home";
-import FakeReporting from "./routes/FakeReporting";
-import Arweave from "arweave";
-import { fakeNewsContractId } from "../../utils/constants";
-import { WarpFactory } from "warp-contracts";
-import { JWKInterface } from "arbundles/src/interface-jwk";
-import { getActiveKeyfile } from "../../utils/background";
+import Home from './routes/Home';
+import FakeReporting from './routes/FakeReporting';
+import Arweave from 'arweave';
+import { fakeNewsContractId } from '../../utils/constants';
+import { WarpFactory } from 'warp-contracts';
+import { JWKInterface } from 'arbundles/src/interface-jwk';
+import { getActiveKeyfile } from '../../utils/background';
 
 export default function App() {
   const wallets = useSelector((state: RootState) => state.wallets),
@@ -37,14 +37,14 @@ export default function App() {
     [addressKey, setAddressKey] = useState<JWKInterface>(),
     [loading, setLoading] = useState({ psts: true, txs: true }),
     [currentTabContentType, setCurrentTabContentType] = useState<
-      "page" | "pdf" | undefined
-    >("page"),
+      'page' | 'pdf' | undefined
+    >('page'),
     smartweave = WarpFactory.forMainnet(),
-    fakeContractTxId = "SaGNYkJaCiOjYYKBZUi8zvhS5R8gm_aFKWALKdGitYo";
+    fakeContractTxId = 'SaGNYkJaCiOjYYKBZUi8zvhS5R8gm_aFKWALKdGitYo';
 
   useEffect(() => {
     if (wallets.length === 0)
-      browser.tabs.create({ url: browser.runtime.getURL("/welcome.html") });
+      browser.tabs.create({ url: browser.runtime.getURL('/welcome.html') });
     // eslint-disable-next-line
   }, []);
 
@@ -67,18 +67,18 @@ export default function App() {
         />
       </Router>
     )) || (
-      <p style={{ textAlign: "center" }}>
-        Click{" "}
+      <p style={{ textAlign: 'center' }}>
+        Click{' '}
         <span
           style={{ color: theme.palette.success }}
           onClick={() =>
             browser.tabs.create({
-              url: browser.runtime.getURL("/welcome.html")
+              url: browser.runtime.getURL('/welcome.html')
             })
           }
         >
           here
-        </span>{" "}
+        </span>{' '}
         if a new window did not open
       </p>
     )

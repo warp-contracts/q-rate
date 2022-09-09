@@ -1,5 +1,5 @@
-import { SignatureOptions } from "arweave/node/lib/crypto/crypto-interface";
-import Transaction from "arweave/node/lib/transaction";
+import { SignatureOptions } from 'arweave/node/lib/crypto/crypto-interface';
+import Transaction from 'arweave/node/lib/transaction';
 
 /**
  * Arweave wallet declarations
@@ -109,7 +109,7 @@ declare global {
       getArweaveConfig(): Promise<{
         host: string;
         port: number;
-        protocol: "http" | "https";
+        protocol: 'http' | 'https';
       }>;
 
       /**
@@ -159,19 +159,19 @@ declare global {
  * Arweave wallet permission types
  */
 export type PermissionType =
-  | "ACCESS_ADDRESS"
-  | "ACCESS_PUBLIC_KEY"
-  | "ACCESS_ALL_ADDRESSES"
-  | "SIGN_TRANSACTION"
-  | "ENCRYPT"
-  | "DECRYPT"
-  | "SIGNATURE"
-  | "ACCESS_ARWEAVE_CONFIG"
-  | "DISPATCH";
+  | 'ACCESS_ADDRESS'
+  | 'ACCESS_PUBLIC_KEY'
+  | 'ACCESS_ALL_ADDRESSES'
+  | 'SIGN_TRANSACTION'
+  | 'ENCRYPT'
+  | 'DECRYPT'
+  | 'SIGNATURE'
+  | 'ACCESS_ARWEAVE_CONFIG'
+  | 'DISPATCH';
 
 export interface DispatchResult {
   id: string;
-  type?: "BASE" | "BUNDLED";
+  type?: 'BASE' | 'BUNDLED';
 }
 
 export interface AppInfo {

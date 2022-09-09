@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Input,
@@ -12,34 +12,34 @@ import {
   useTheme,
   useToasts,
   Select
-} from "@geist-ui/react";
-import { useDispatch, useSelector } from "react-redux";
-import { motion, AnimatePresence } from "framer-motion";
-import { RootState } from "../../stores/reducers";
-import { MessageType } from "../../utils/messenger";
+} from '@geist-ui/react';
+import { useDispatch, useSelector } from 'react-redux';
+import { motion, AnimatePresence } from 'framer-motion';
+import { RootState } from '../../stores/reducers';
+import { MessageType } from '../../utils/messenger';
 import {
   addAllowance,
   setAllowanceLimit,
   setPermissions,
   switchProfile,
   toggleAllowance
-} from "../../stores/actions";
-import { getRealURL, shortenURL, formatAddress } from "../../utils/url";
-import { ChevronRightIcon } from "@primer/octicons-react";
-import { Allowance } from "../../stores/reducers/allowances";
-import { checkPassword } from "../../utils/auth";
-import { browser } from "webextension-polyfill-ts";
+} from '../../stores/actions';
+import { getRealURL, shortenURL, formatAddress } from '../../utils/url';
+import { ChevronRightIcon } from '@primer/octicons-react';
+import { Allowance } from '../../stores/reducers/allowances';
+import { checkPassword } from '../../utils/auth';
+import { browser } from 'webextension-polyfill-ts';
 import {
   PermissionType,
   PermissionDescriptions
-} from "../../utils/permissions";
-import toastStyles from "../../styles/components/SmallToast.module.sass";
-import styles from "../../styles/views/Auth/view.module.sass";
+} from '../../utils/permissions';
+import toastStyles from '../../styles/components/SmallToast.module.sass';
+import styles from '../../styles/views/Auth/view.module.sass';
 
 export default function App() {
-  const passwordInput = useInput(""),
+  const passwordInput = useInput(''),
     [passwordStatus, setPasswordStatus] = useState<
-      "default" | "secondary" | "success" | "warning" | "error"
+      'default' | 'secondary' | 'success' | 'warning' | 'error'
     >(),
     [loading, setLoading] = useState(false),
     [loggedIn, setLoggedIn] = useState(false),
@@ -52,7 +52,7 @@ export default function App() {
     dispatch = useDispatch(),
     [alreadyHasPermissions, setAlreadyHasPermissions] = useState(false),
     allowanceModal = useModal(false),
-    allowanceAmount = useInput("0"),
+    allowanceAmount = useInput('0'),
     allowances = useSelector((state: RootState) => state.allowances),
     [currentAllowance, setCurrentAllowance] = useState<Allowance>(),
     [spendingLimitReached, setSpendingLimitReached] = useState<boolean>(),
@@ -70,7 +70,7 @@ export default function App() {
 
   useEffect(() => {
     // get the auth param from the url
-    const authVal = new URL(window.location.href).searchParams.get("auth");
+    const authVal = new URL(window.location.href).searchParams.get('auth');
 
     // invalid auth
     if (!authVal) {
@@ -102,7 +102,7 @@ export default function App() {
     url = getRealURL(url);
 
     // connect event
-    if (decodedAuthParam.type === "connect" && decodedAuthParam.permissions) {
+    if (decodedAuthParam.type === 'connect' && decodedAuthParam.permissions) {
       // get the existing permissions
       const existingPermissions = permissions.find(
           (permGroup) => permGroup.url === url
@@ -127,20 +127,20 @@ export default function App() {
       }
 
       // create transaction event
-    } else if (decodedAuthParam.type === "sign_auth") {
+    } else if (decodedAuthParam.type === 'sign_auth') {
       // check permissions
-      if (!checkPermissions(["SIGN_TRANSACTION"], url))
+      if (!checkPermissions(['SIGN_TRANSACTION'], url))
         return sendPermissionError();
 
       // encrypt data event
-    } else if (decodedAuthParam.type === "encrypt_auth") {
+    } else if (decodedAuthParam.type === 'encrypt_auth') {
       // check permissions
-      if (!checkPermissions(["ENCRYPT"], url)) return sendPermissionError();
+      if (!checkPermissions(['ENCRYPT'], url)) return sendPermissionError();
 
       // decrypt data event
-    } else if (decodedAuthParam.type === "decrypt_auth") {
+    } else if (decodedAuthParam.type === 'decrypt_auth') {
       // check permissions
-      if (!checkPermissions(["DECRYPT"], url)) return sendPermissionError();
+      if (!checkPermissions(['DECRYPT'], url)) return sendPermissionError();
 
       // if non of the types matched, this is an invalid auth call
     } else {
@@ -181,7 +181,7 @@ export default function App() {
         dispatch(setAllowanceLimit(currentURL, updateAllowance));
 
       // any event that needs authentication, but not the connect event
-      if (type !== "connect") {
+      if (type !== 'connect') {
         if (!currentURL) {
           return urlError();
         } else {
@@ -195,7 +195,7 @@ export default function App() {
         setLoading(false);
       }
     } catch {
-      setPasswordStatus("error");
+      setPasswordStatus('error');
       setLoading(false);
     }
   }
@@ -203,10 +203,10 @@ export default function App() {
   function successCall() {
     browser.runtime.sendMessage({
       type: getReturnType(),
-      ext: "arconnect",
+      ext: 'arconnect',
       res: true,
-      message: "Success",
-      sender: "popup"
+      message: 'Success',
+      sender: 'popup'
     });
     closeWindow();
   }
@@ -214,10 +214,10 @@ export default function App() {
   function invalidAuthCall() {
     browser.runtime.sendMessage({
       type: getReturnType(),
-      ext: "arconnect",
+      ext: 'arconnect',
       res: false,
-      message: "Invalid auth call",
-      sender: "popup"
+      message: 'Invalid auth call',
+      sender: 'popup'
     });
     closeWindow();
   }
@@ -226,22 +226,22 @@ export default function App() {
   function urlError() {
     browser.runtime.sendMessage({
       type: getReturnType(),
-      ext: "arconnect",
+      ext: 'arconnect',
       res: false,
-      message: "No tab selected",
-      sender: "popup"
+      message: 'No tab selected',
+      sender: 'popup'
     });
     closeWindow();
   }
 
   // get the type that needs to be returned in the message
   function getReturnType(): MessageType {
-    if (type === "connect") return "connect_result";
-    else if (type === "sign_auth") return "sign_auth_result";
-    else if (type === "encrypt_auth") return "encrypt_auth_result";
-    else if (type === "decrypt_auth") return "encrypt_auth_result";
+    if (type === 'connect') return 'connect_result';
+    else if (type === 'sign_auth') return 'sign_auth_result';
+    else if (type === 'encrypt_auth') return 'encrypt_auth_result';
+    else if (type === 'decrypt_auth') return 'encrypt_auth_result';
     //
-    return "connect_result";
+    return 'connect_result';
   }
 
   // accept permissions
@@ -259,10 +259,10 @@ export default function App() {
   function cancel() {
     browser.runtime.sendMessage({
       type: getReturnType(),
-      ext: "arconnect",
+      ext: 'arconnect',
       res: false,
-      message: "User cancelled the login",
-      sender: "popup"
+      message: 'User cancelled the login',
+      sender: 'popup'
     });
     closeWindow();
   }
@@ -276,11 +276,11 @@ export default function App() {
   function sendPermissionError() {
     browser.runtime.sendMessage({
       type: getReturnType(),
-      ext: "arconnect",
+      ext: 'arconnect',
       res: false,
       message:
-        "The site does not have the required permissions for this action",
-      sender: "popup"
+        'The site does not have the required permissions for this action',
+      sender: 'popup'
     });
   }
 
@@ -303,7 +303,7 @@ export default function App() {
         limit: 0.1,
         spent: 0
       });
-      allowanceAmount.setState("0.1");
+      allowanceAmount.setState('0.1');
     } else {
       setCurrentAllowance(curr);
       allowanceAmount.setState(curr.limit.toString());
@@ -313,12 +313,12 @@ export default function App() {
   function switchWallet(address: string) {
     dispatch(switchProfile(address));
     browser.runtime.sendMessage({
-      type: "switch_wallet_event",
-      ext: "arconnect",
+      type: 'switch_wallet_event',
+      ext: 'arconnect',
       res: true,
-      message: "",
+      message: '',
       address,
-      sender: "popup"
+      sender: 'popup'
     });
     setShowSwitch(true);
     setTimeout(() => setShowSwitch(false), 1700);
@@ -331,10 +331,10 @@ export default function App() {
           <Note
             type="warning"
             style={{
-              position: "fixed",
-              top: "2em",
-              left: ".7em",
-              right: ".7em"
+              position: 'fixed',
+              top: '2em',
+              left: '.7em',
+              right: '.7em'
             }}
           >
             You have reached your spending limit of {currentAllowance?.limit} AR
@@ -342,18 +342,18 @@ export default function App() {
             {(appInfo.name && (
               <span style={{ color: theme.palette.success }}>
                 {(appInfo.name &&
-                  ((appInfo.name.includes(".") && shortenURL(appInfo.name)) ||
+                  ((appInfo.name.includes('.') && shortenURL(appInfo.name)) ||
                     appInfo.name)) ||
-                  ""}
+                  ''}
               </span>
             )) ||
-              " this site"}{" "}
+              ' this site'}{' '}
             . Please update it or cancel.
             {quickAdd && (
               <>
                 <br />
                 <span
-                  style={{ textDecoration: "underline", cursor: "pointer" }}
+                  style={{ textDecoration: 'underline', cursor: 'pointer' }}
                   onClick={() => {
                     const updateTo = (currentAllowance?.limit ?? 0) + 0.1;
 
@@ -361,8 +361,8 @@ export default function App() {
                     allowanceAmount.setState(updateTo.toString());
                     setQuickAdd(false);
                     setToast({
-                      text: "The added allowance will be applied after you enter you password",
-                      type: "success"
+                      text: 'The added allowance will be applied after you enter you password',
+                      type: 'success'
                     });
                   }}
                 >
@@ -375,41 +375,41 @@ export default function App() {
         {(!loggedIn && (
           <>
             <h1>Sign In</h1>
-            {(type === "connect" && (
+            {(type === 'connect' && (
               <p>
                 {(appInfo.name && (
                   <span style={{ color: theme.palette.success }}>
                     {(appInfo.name &&
-                      ((appInfo.name.includes(".") &&
+                      ((appInfo.name.includes('.') &&
                         shortenURL(appInfo.name)) ||
                         appInfo.name)) ||
-                      ""}
+                      ''}
                   </span>
                 )) ||
-                  "This site"}{" "}
+                  'This site'}{' '}
                 wants to connect to your Arweave wallet. Please enter your
                 password to continue.
               </p>
             )) ||
-              (type === "sign_auth" && (
+              (type === 'sign_auth' && (
                 <p>
                   This site wants to sign a transaction. Please enter your
                   password to continue.
                 </p>
               )) ||
-              (type === "encrypt_auth" && (
+              (type === 'encrypt_auth' && (
                 <p>
                   This site wants to encrypt some data. Please enter your
                   password to continue.
                 </p>
               )) ||
-              (type === "decrypt_auth" && (
+              (type === 'decrypt_auth' && (
                 <p>
                   This site wants to decrypt some data. Please enter your
                   password to continue.
                 </p>
               ))}
-            {type === "connect" && (
+            {type === 'connect' && (
               <>
                 <p className={styles.SelectLabel}>Select wallet</p>
                 <Select
@@ -432,12 +432,12 @@ export default function App() {
               type={passwordStatus}
               placeholder="Password..."
               onKeyPress={(e) => {
-                if (e.key === "Enter") login();
+                if (e.key === 'Enter') login();
               }}
             />
             <Spacer />
             <div className={styles.Allowance}>
-              <div className={styles.Check + " " + styles.Checked}>
+              <div className={styles.Check + ' ' + styles.Checked}>
                 <Checkbox
                   checked={currentAllowance?.enabled}
                   scale={1.5}
@@ -457,7 +457,7 @@ export default function App() {
             </div>
             <Spacer />
             <Button
-              style={{ width: "100%" }}
+              style={{ width: '100%' }}
               onClick={login}
               loading={loading}
               type="success"
@@ -465,7 +465,7 @@ export default function App() {
               Log In
             </Button>
             <Spacer h={0.73} />
-            <Button style={{ width: "100%" }} onClick={cancel}>
+            <Button style={{ width: '100%' }} onClick={cancel}>
               Cancel
             </Button>
             <h2 className={styles.th8ta}>
@@ -473,7 +473,7 @@ export default function App() {
             </h2>
           </>
         )) ||
-          (type === "connect" && (
+          (type === 'connect' && (
             <>
               <h1>Permissions</h1>
               {(alreadyHasPermissions && (
@@ -482,7 +482,7 @@ export default function App() {
               {(requestedPermissions.length > 0 && (
                 <ul>
                   {requestedPermissions.map((permission, i) => (
-                    <li key={i} className={styles.Check + " " + styles.Checked}>
+                    <li key={i} className={styles.Check + ' ' + styles.Checked}>
                       <Checkbox
                         checked
                         scale={1.5}
@@ -504,42 +504,42 @@ export default function App() {
                 </ul>
               )) || <p>No permissions requested.</p>}
               <Spacer />
-              <Button style={{ width: "100%" }} onClick={accept} type="success">
+              <Button style={{ width: '100%' }} onClick={accept} type="success">
                 Accept
               </Button>
               <Spacer />
-              <Button style={{ width: "100%" }} onClick={cancel}>
+              <Button style={{ width: '100%' }} onClick={cancel}>
                 Cancel
               </Button>
               <div className={styles.AppInfo}>
                 {appInfo.logo && (
                   <img
                     src={appInfo.logo}
-                    alt={appInfo.name ?? ""}
+                    alt={appInfo.name ?? ''}
                     draggable={false}
                   />
                 )}
                 {(appInfo.name &&
-                  ((appInfo.name.includes(".") && shortenURL(appInfo.name)) ||
+                  ((appInfo.name.includes('.') && shortenURL(appInfo.name)) ||
                     appInfo.name)) ||
-                  ""}
+                  ''}
               </div>
             </>
           )) || (
             <p
               style={{
-                position: "fixed",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                textAlign: "center",
-                width: "75%"
+                position: 'fixed',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                textAlign: 'center',
+                width: '75%'
               }}
             >
-              <Loading style={{ display: "block", margin: "0 auto" }} />
-              {type === "sign_auth" && "Signing a transaction."}
-              {type === "encrypt_auth" && "Encrypting some data."}
-              {type === "decrypt_auth" && "Decrypting some data."}
+              <Loading style={{ display: 'block', margin: '0 auto' }} />
+              {type === 'sign_auth' && 'Signing a transaction.'}
+              {type === 'encrypt_auth' && 'Encrypting some data.'}
+              {type === 'decrypt_auth' && 'Decrypting some data.'}
             </p>
           )}
       </div>
@@ -559,7 +559,7 @@ export default function App() {
         <Modal.Title>Allowance limit</Modal.Title>
         <Modal.Content className={styles.AllowanceModal}>
           <p>
-            Warn me again to set a new allowance once the app has sent more than{" "}
+            Warn me again to set a new allowance once the app has sent more than{' '}
             {allowanceAmount.state} AR
           </p>
           <Input
@@ -586,7 +586,7 @@ export default function App() {
   );
 }
 
-type AuthType = "connect" | "sign_auth" | "encrypt_auth" | "decrypt_auth";
+type AuthType = 'connect' | 'sign_auth' | 'encrypt_auth' | 'decrypt_auth';
 interface IAppInfo {
   name?: string;
   logo?: string;

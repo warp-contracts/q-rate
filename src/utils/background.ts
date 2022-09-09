@@ -1,16 +1,16 @@
-import { MessageType, validateMessage } from "../utils/messenger";
-import { RootState } from "../stores/reducers";
-import { IPermissionState } from "../stores/reducers/permissions";
-import { IArweave, defaultConfig } from "../stores/reducers/arweave";
-import { PermissionType } from "./permissions";
-import { JWKInterface } from "arweave/node/lib/wallet";
-import { getRealURL } from "./url";
-import { browser } from "webextension-polyfill-ts";
-import type { DataItem } from "arbundles";
-import { run } from "ar-gql";
-import axios from "axios";
-import limestone from "@limestonefi/api";
-import Arweave from "arweave";
+import { MessageType, validateMessage } from '../utils/messenger';
+import { RootState } from '../stores/reducers';
+import { IPermissionState } from '../stores/reducers/permissions';
+import { IArweave, defaultConfig } from '../stores/reducers/arweave';
+import { PermissionType } from './permissions';
+import { JWKInterface } from 'arweave/node/lib/wallet';
+import { getRealURL } from './url';
+import { browser } from 'webextension-polyfill-ts';
+import type { DataItem } from 'arbundles';
+import { run } from 'ar-gql';
+import axios from 'axios';
+import limestone from '@limestonefi/api';
+import Arweave from 'arweave';
 
 /**
  * Create an authenticator popup
@@ -21,11 +21,11 @@ import Arweave from "arweave";
  */
 export const createAuthPopup = (data: any) =>
   browser.windows.create({
-    url: `${browser.runtime.getURL("auth.html")}?auth=${encodeURIComponent(
+    url: `${browser.runtime.getURL('auth.html')}?auth=${encodeURIComponent(
       JSON.stringify(data)
     )}`,
     focused: true,
-    type: "popup",
+    type: 'popup',
     width: 385,
     height: 635
   });
@@ -62,7 +62,7 @@ export async function checkPermissions(
  * @returns Permissions for the app
  */
 export async function getPermissions(url: string): Promise<PermissionType[]> {
-  const storedPermissions = (await getStoreData())?.["permissions"];
+  const storedPermissions = (await getStoreData())?.['permissions'];
   url = getRealURL(url);
 
   if (!storedPermissions) return [];
@@ -84,10 +84,10 @@ export type StoreData = Partial<RootState>;
  * @returns StoreData
  */
 export async function getStoreData(): Promise<StoreData> {
-  const data = (await browser.storage.local.get("persist:root"))?.[
-      "persist:root"
+  const data = (await browser.storage.local.get('persist:root'))?.[
+      'persist:root'
     ],
-    parseRoot: StoreData = JSON.parse(data ?? "{}");
+    parseRoot: StoreData = JSON.parse(data ?? '{}');
 
   let parsedData: StoreData = {};
   // @ts-ignore
@@ -112,7 +112,7 @@ export async function setStoreData(updatedData: StoreData) {
   }
 
   await browser.storage.local.set({
-    "persist:root": JSON.stringify(encodedData)
+    'persist:root': JSON.stringify(encodedData)
   });
 }
 
@@ -150,11 +150,11 @@ export async function getFeeAmount(address: string, arweave: Arweave) {
   let arPrice = 0;
 
   try {
-    const res = await limestone.getPrice("AR");
+    const res = await limestone.getPrice('AR');
     arPrice = res.price;
   } catch {
     const { data: res }: any = await axios.get(
-      "https://api.coingecko.com/api/v3/simple/price?ids=arweave&vs_currencies=usd"
+      'https://api.coingecko.com/api/v3/simple/price?ids=arweave&vs_currencies=usd'
     );
     arPrice = res.arweave.usd;
   }
@@ -173,7 +173,7 @@ export async function getFeeAmount(address: string, arweave: Arweave) {
  */
 export async function walletsStored(): Promise<boolean> {
   try {
-    const wallets = (await getStoreData())?.["wallets"];
+    const wallets = (await getStoreData())?.['wallets'];
 
     if (!wallets || wallets.length === 0) return false;
     return true;
@@ -193,7 +193,7 @@ export async function walletsStored(): Promise<boolean> {
 export const authenticateUser = (action: MessageType, tabURL: string) =>
   new Promise<void>(async (resolve, reject) => {
     try {
-      const decryptionKey = (await browser.storage.local.get("decryptionKey"))
+      const decryptionKey = (await browser.storage.local.get('decryptionKey'))
         ?.decryptionKey;
       if (decryptionKey) return resolve();
 
@@ -204,7 +204,7 @@ export const authenticateUser = (action: MessageType, tabURL: string) =>
       browser.runtime.onMessage.addListener(async (msg) => {
         if (
           !validateMessage(msg, {
-            sender: "popup",
+            sender: 'popup',
             type: `${action}_result` as MessageType
           }) ||
           !msg.decryptionKey ||
@@ -231,22 +231,22 @@ export async function getActiveTab(returnFromCache = true) {
   const tabs = await browser.tabs.query({ active: true, currentWindow: true });
   let activeTab = tabs[0];
 
-  if (!activeTab && !returnFromCache) throw new Error("No tabs opened");
+  if (!activeTab && !returnFromCache) throw new Error('No tabs opened');
   // if there is an active tab (that is not a chrome/firefox/internal tab)
-  else if (activeTab && !isInternalURL(activeTab.url || "")) {
+  else if (activeTab && !isInternalURL(activeTab.url || '')) {
     // the active tab can be cached in the browser's localstorage
     // because it does not change often and it does not hold
     // any sensitive information
-    localStorage.setItem("lastActiveTab", JSON.stringify(activeTab));
+    localStorage.setItem('lastActiveTab', JSON.stringify(activeTab));
 
     return activeTab;
   }
 
   // this continues, if the cache loading
   // is enabled and the activeTab is undefined
-  const storedTab = localStorage.getItem("lastActiveTab");
+  const storedTab = localStorage.getItem('lastActiveTab');
 
-  if (!storedTab) throw new Error("No active tab cached");
+  if (!storedTab) throw new Error('No active tab cached');
   activeTab = JSON.parse(storedTab);
 
   return activeTab;
@@ -271,7 +271,7 @@ const getCommunityContractId = async (
   url: string
 ): Promise<string | undefined> => {
   const response = await axios.head(url);
-  return response.headers["x-community-contract"];
+  return response.headers['x-community-contract'];
 };
 
 /**
@@ -283,12 +283,12 @@ export async function checkCommunityContract(
   url: string
 ): Promise<string | undefined> {
   try {
-    if (url.startsWith("chrome://") || url.startsWith("about:"))
+    if (url.startsWith('chrome://') || url.startsWith('about:'))
       return undefined;
     const id = await getCommunityContractId(url);
     return id && /[a-z0-9_-]{43}/i.test(id) ? id : undefined;
   } catch (err) {
-    console.log("Error: ", err);
+    console.log('Error: ', err);
   }
 
   return undefined;
@@ -317,16 +317,16 @@ export function isInternalURL(url: string) {
  */
 export async function getActiveKeyfile() {
   const storeData = await getStoreData();
-  const storedKeyfiles = storeData?.["wallets"] ?? [];
-  const storedAddress = storeData?.["profile"];
+  const storedKeyfiles = storeData?.['wallets'] ?? [];
+  const storedAddress = storeData?.['profile'];
   const keyfileToDecrypt = storedKeyfiles.find(
     (item) => item.address === storedAddress
   )?.keyfile;
 
   if (storedKeyfiles.length === 0 || !storedAddress || !keyfileToDecrypt) {
-    browser.tabs.create({ url: browser.runtime.getURL("/welcome.html") });
+    browser.tabs.create({ url: browser.runtime.getURL('/welcome.html') });
 
-    throw new Error("No keyfiles added");
+    throw new Error('No keyfiles added');
   }
 
   const keyfile: JWKInterface = JSON.parse(atob(keyfileToDecrypt));
@@ -339,7 +339,7 @@ export async function getActiveKeyfile() {
 
 export interface DispatchResult {
   id: string;
-  type?: "BASE" | "BUNDLED";
+  type?: 'BASE' | 'BUNDLED';
 }
 
 export function generateBundlrAnchor() {
@@ -360,11 +360,11 @@ export function generateBundlrAnchor() {
  */
 export async function uploadDataToBundlr(dataItem: DataItem) {
   const res = await axios.post(
-    "https://node2.bundlr.network/tx",
+    'https://node2.bundlr.network/tx',
     dataItem.getRaw(),
     {
       headers: {
-        "Content-Type": "application/octet-stream"
+        'Content-Type': 'application/octet-stream'
       },
       maxBodyLength: Infinity
     }

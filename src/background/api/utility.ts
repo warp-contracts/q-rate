@@ -1,6 +1,6 @@
-import { getStoreData } from "../../utils/background";
-import { MessageFormat } from "../../utils/messenger";
-import axios from "axios";
+import { getStoreData } from '../../utils/background';
+import { MessageFormat } from '../../utils/messenger';
+import axios from 'axios';
 
 /**
  * Utility API functions. These functions are for
@@ -11,7 +11,7 @@ import axios from "axios";
 export const walletNames = () =>
   new Promise<Partial<MessageFormat>>(async (resolve, _) => {
     try {
-      const wallets = (await getStoreData())?.["wallets"];
+      const wallets = (await getStoreData())?.['wallets'];
 
       if (wallets) {
         let names: { [addr: string]: string } = {};
@@ -24,12 +24,12 @@ export const walletNames = () =>
       } else
         resolve({
           res: false,
-          message: "No wallets storage found"
+          message: 'No wallets storage found'
         });
     } catch {
       resolve({
         res: false,
-        message: "Error getting data from wallets storage"
+        message: 'Error getting data from wallets storage'
       });
     }
   });
@@ -44,7 +44,7 @@ export const addToken = (message: MessageFormat) =>
     } catch {
       resolve({
         res: false,
-        message: "Error querying the Verto cache"
+        message: 'Error querying the Verto cache'
       });
     }
   });

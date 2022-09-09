@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Card,
   useTheme,
@@ -12,22 +12,22 @@ import {
   Input,
   Spacer,
   Code
-} from "@geist-ui/react";
-import { FileIcon } from "@primer/octicons-react";
-import { JWKInterface } from "arweave/node/lib/wallet";
-import { getKeyFromMnemonic } from "arweave-mnemonic-keys";
-import { useDispatch, useSelector } from "react-redux";
-import { Wallet } from "../../stores/reducers/wallets";
-import { setWallets, switchProfile } from "../../stores/actions";
-import { RootState } from "../../stores/reducers";
-import { checkPassword as checkPw, setPassword } from "../../utils/auth";
-import { browser } from "webextension-polyfill-ts";
-import bip39 from "bip39-web-crypto";
-import CryptoES from "crypto-es";
-import Arweave from "arweave";
-import logo from "../../assets/warp_logo.png";
-import arconnectLogo from "../../assets/logo.png";
-import styles from "../../styles/views/Welcome/view.module.sass";
+} from '@geist-ui/react';
+import { FileIcon } from '@primer/octicons-react';
+import { JWKInterface } from 'arweave/node/lib/wallet';
+import { getKeyFromMnemonic } from 'arweave-mnemonic-keys';
+import { useDispatch, useSelector } from 'react-redux';
+import { Wallet } from '../../stores/reducers/wallets';
+import { setWallets, switchProfile } from '../../stores/actions';
+import { RootState } from '../../stores/reducers';
+import { checkPassword as checkPw, setPassword } from '../../utils/auth';
+import { browser } from 'webextension-polyfill-ts';
+import bip39 from 'bip39-web-crypto';
+import CryptoES from 'crypto-es';
+import Arweave from 'arweave';
+import logo from '../../assets/warp_logo.png';
+import arconnectLogo from '../../assets/logo.png';
+import styles from '../../styles/views/Welcome/view.module.sass';
 
 export default function App() {
   const theme = useTheme(),
@@ -51,25 +51,25 @@ export default function App() {
     }>(),
     arweaveConfig = useSelector((state: RootState) => state.arweave),
     arweave = new Arweave(arweaveConfig),
-    passwordInput = useInput(""),
-    passwordInputAgain = useInput(""),
+    passwordInput = useInput(''),
+    passwordInputAgain = useInput(''),
     [passwordGiven, setPasswordGiven] = useState(false),
     feeModal = useModal(false),
     loadConfigModal = useModal(),
-    configPasswordInput = useInput(""),
+    configPasswordInput = useInput(''),
     configFileInput = useRef<HTMLInputElement>(null),
     [configFilenameDisplay, setConfigFilenameDisplay] =
-      useState("Click to load"),
+      useState('Click to load'),
     [loadingConfig, setLoadingConfig] = useState(false);
 
   useEffect(() => {
     if (!fileInput.current) return;
     const fileInputCurrent = fileInput.current;
 
-    fileInputCurrent.addEventListener("change", loadFiles);
+    fileInputCurrent.addEventListener('change', loadFiles);
 
     return function cleanup() {
-      fileInputCurrent.removeEventListener("change", loadFiles);
+      fileInputCurrent.removeEventListener('change', loadFiles);
     };
     // eslint-disable-next-line
   }, [fileInput.current]);
@@ -79,13 +79,13 @@ export default function App() {
     const fileInputCurrent = configFileInput.current;
     const updateDisplay = () =>
       setConfigFilenameDisplay(
-        fileInputCurrent.files?.[0].name ?? "Click to load"
+        fileInputCurrent.files?.[0].name ?? 'Click to load'
       );
 
-    fileInputCurrent.addEventListener("change", updateDisplay);
+    fileInputCurrent.addEventListener('change', updateDisplay);
 
     return function cleanup() {
-      fileInputCurrent.removeEventListener("change", updateDisplay);
+      fileInputCurrent.removeEventListener('change', updateDisplay);
     };
     // eslint-disable-next-line
   }, [configFileInput.current]);
@@ -93,7 +93,7 @@ export default function App() {
   function loadFiles() {
     if (fileInput.current?.files)
       for (const file of fileInput.current.files) {
-        if (file.type !== "application/json") continue;
+        if (file.type !== 'application/json') continue;
         const reader = new FileReader();
 
         try {
@@ -101,14 +101,14 @@ export default function App() {
         } catch {
           setToast({
             text: `There was an error when loading ${file.name}`,
-            type: "error"
+            type: 'error'
           });
         }
 
         reader.onabort = () =>
-          setToast({ text: "File reading was aborted", type: "error" });
+          setToast({ text: 'File reading was aborted', type: 'error' });
         reader.onerror = () =>
-          setToast({ text: "File reading has failed", type: "error" });
+          setToast({ text: 'File reading has failed', type: 'error' });
         reader.onload = (e) => {
           try {
             const keyfile: JWKInterface = JSON.parse(
@@ -117,8 +117,8 @@ export default function App() {
             setKeyfiles((val) => [...val, { keyfile, filename: file.name }]);
           } catch {
             setToast({
-              text: "There was an error when loading a keyfile",
-              type: "error"
+              text: 'There was an error when loading a keyfile',
+              type: 'error'
             });
           }
         };
@@ -151,12 +151,12 @@ export default function App() {
     if (walletsStoreEmpty) dispatch(switchProfile(wallets[0].address));
     setLoading(false);
     loadWalletsModal.setVisible(false);
-    setToast({ text: "Loaded wallets", type: "success" });
+    setToast({ text: 'Loaded wallets', type: 'success' });
     // allow time to save the wallets
     setTimeout(() => {
       loadWalletsModal.setVisible(false);
       setKeyfiles([]);
-      if (fileInput.current) fileInput.current.value = "";
+      if (fileInput.current) fileInput.current.value = '';
     }, 600);
   }
 
@@ -187,16 +187,16 @@ export default function App() {
 
   function downloadSeedWallet() {
     if (!seedKeyfile) return;
-    const el = document.createElement("a");
+    const el = document.createElement('a');
 
     el.setAttribute(
-      "href",
+      'href',
       `data:application/json;charset=utf-8,${encodeURIComponent(
         JSON.stringify(seedKeyfile.keyfile, null, 2)
       )}`
     );
-    el.setAttribute("download", `arweave-keyfile-${seedKeyfile.address}.json`);
-    el.style.display = "none";
+    el.setAttribute('download', `arweave-keyfile-${seedKeyfile.address}.json`);
+    el.style.display = 'none';
 
     document.body.appendChild(el);
     el.click();
@@ -204,16 +204,16 @@ export default function App() {
   }
 
   async function createPassword() {
-    if (passwordInput.state === "" || passwordInputAgain.state === "") {
-      setToast({ text: "Please fill both password fields", type: "error" });
+    if (passwordInput.state === '' || passwordInputAgain.state === '') {
+      setToast({ text: 'Please fill both password fields', type: 'error' });
       return;
     }
     if (passwordInput.state !== passwordInputAgain.state) {
-      setToast({ text: "The two passwords are not the same", type: "error" });
+      setToast({ text: 'The two passwords are not the same', type: 'error' });
       return;
     }
     if (passwordInputAgain.state.length < 5) {
-      setToast({ text: "Weak password", type: "error" });
+      setToast({ text: 'Weak password', type: 'error' });
       return;
     }
 
@@ -228,9 +228,9 @@ export default function App() {
       if (!res) throw new Error();
 
       setPasswordGiven(true);
-      setToast({ text: "Logged in", type: "success" });
+      setToast({ text: 'Logged in', type: 'success' });
     } catch {
-      setToast({ text: "Wrong password", type: "error" });
+      setToast({ text: 'Wrong password', type: 'error' });
     }
     setLoading(false);
   }
@@ -240,13 +240,13 @@ export default function App() {
       !configFileInput.current?.files ||
       configFileInput.current.files.length === 0
     )
-      return setToast({ text: "Please load your config file", type: "error" });
+      return setToast({ text: 'Please load your config file', type: 'error' });
 
     // read config
     const file = configFileInput.current.files[0];
 
-    if (file.type !== "text/plain")
-      return setToast({ text: "Invalid file format", type: "error" });
+    if (file.type !== 'text/plain')
+      return setToast({ text: 'Invalid file format', type: 'error' });
 
     const reader = new FileReader();
 
@@ -255,17 +255,17 @@ export default function App() {
     } catch {
       setToast({
         text: `There was an error when loading ${file.name}`,
-        type: "error"
+        type: 'error'
       });
     }
 
     reader.onabort = () =>
-      setToast({ text: "File reading was aborted", type: "error" });
+      setToast({ text: 'File reading was aborted', type: 'error' });
     reader.onerror = () =>
-      setToast({ text: "File reading has failed", type: "error" });
+      setToast({ text: 'File reading has failed', type: 'error' });
     reader.onload = async (e) => {
       if (!e.target?.result)
-        return setToast({ text: "Error reading the file", type: "error" });
+        return setToast({ text: 'Error reading the file', type: 'error' });
 
       setLoadingConfig(true);
       // decrypt config and apply settings
@@ -277,13 +277,13 @@ export default function App() {
 
         await setPassword(configPasswordInput.state);
         await browser.storage.local.set({
-          "persist:root": decrypted.toString(CryptoES.enc.Utf8),
+          'persist:root': decrypted.toString(CryptoES.enc.Utf8),
           decryptionKey: false
         });
-        setToast({ text: "Loaded config", type: "success" });
+        setToast({ text: 'Loaded config', type: 'success' });
         setTimeout(() => window.location.reload(), 1300);
       } catch {
-        setToast({ text: "Invalid password", type: "error" });
+        setToast({ text: 'Invalid password', type: 'error' });
       }
       setLoadingConfig(false);
       loadConfigModal.setVisible(false);
@@ -296,25 +296,25 @@ export default function App() {
         <Card className={styles.Card}>
           <img src={logo} alt="logo" className={styles.Logo} />
           <h1>
-            Welcome{" "}
+            Welcome{' '}
             {(walletsStore.length === 0 && (
               <>
                 to <br />
                 <span style={{ color: theme.palette.success }}>QRate</span>
               </>
             )) ||
-              "back! :)"}
+              'back! :)'}
           </h1>
-          <div style={{ color: theme.palette.accents_4, padding: "0.5rem" }}>
+          <div style={{ color: theme.palette.accents_4, padding: '0.5rem' }}>
             <div>
               Participate in disputes, stake tokens and help community in
               detecting fake news.
             </div>
             {!passwordGiven && (
-              <div style={{ paddingTop: "1em" }}>
+              <div style={{ paddingTop: '1em' }}>
                 {walletsStore.length === 0
-                  ? "Please create a password to encrypt your keyfiles."
-                  : "Please enter your password."}
+                  ? 'Please create a password to encrypt your keyfiles.'
+                  : 'Please enter your password.'}
               </div>
             )}
           </div>
@@ -332,7 +332,7 @@ export default function App() {
               <Input.Password
                 {...passwordInput.bindings}
                 onKeyPress={(e) => {
-                  if (e.key === "Enter" && walletsStore.length > 0)
+                  if (e.key === 'Enter' && walletsStore.length > 0)
                     checkPassword();
                 }}
                 placeholder="Password..."
@@ -344,7 +344,7 @@ export default function App() {
                     {...passwordInputAgain.bindings}
                     placeholder="Password again..."
                     onKeyPress={(e) => {
-                      if (e.key === "Enter") createPassword();
+                      if (e.key === 'Enter') createPassword();
                     }}
                   />
                 </>
@@ -357,13 +357,13 @@ export default function App() {
                 }}
                 loading={loading}
               >
-                {walletsStore.length === 0 ? "Create" : "Login"}
+                {walletsStore.length === 0 ? 'Create' : 'Login'}
               </Button>
               {walletsStore.length === 0 && (
                 <>
                   <span
                     className={styles.OR}
-                    style={{ width: "50%", margin: "1em auto" }}
+                    style={{ width: '50%', margin: '1em auto' }}
                   >
                     OR
                   </span>
@@ -376,19 +376,19 @@ export default function App() {
           )}
           <div
             style={{
-              marginTop: "1.75em",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexDirection: "column"
+              marginTop: '1.75em',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'column'
             }}
           >
             <div>
-              Powered by{" "}
+              Powered by{' '}
               <a
                 href="https://www.arconnect.io/"
                 target="_blank"
-                style={{ color: theme.palette.link, cursor: "pointer" }}
+                style={{ color: theme.palette.link, cursor: 'pointer' }}
               >
                 ArConnect
               </a>
@@ -397,7 +397,7 @@ export default function App() {
           <img
             src={arconnectLogo}
             alt="logo"
-            style={{ width: "2em", height: "2em" }}
+            style={{ width: '2em', height: '2em' }}
           />
         </Card>
       </div>
@@ -405,14 +405,14 @@ export default function App() {
       <Modal {...loadWalletsModal.bindings}>
         <Modal.Title>Load wallet(s)</Modal.Title>
         <Modal.Subtitle>
-          Use your{" "}
+          Use your{' '}
           <a
             href="https://www.arweave.org/wallet"
             target="_blank"
             rel="noopener noreferrer"
           >
             Arweave keyfile
-          </a>{" "}
+          </a>{' '}
           or seedphrase to continue.
         </Modal.Subtitle>
         <Modal.Content>
@@ -429,7 +429,7 @@ export default function App() {
                   text="Click to remove."
                   placement="right"
                   key={i}
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                 >
                   <Card
                     className={styles.FileContent}
@@ -438,7 +438,7 @@ export default function App() {
                         val.filter(({ filename }) => filename !== file.filename)
                       )
                     }
-                    style={{ display: "flex", alignItems: "center" }}
+                    style={{ display: 'flex', alignItems: 'center' }}
                   >
                     <div className={styles.items}>
                       <p className={styles.Filename}>{file.filename}</p>
@@ -450,13 +450,13 @@ export default function App() {
           <Card
             className={styles.FileContent}
             onClick={() => fileInput.current?.click()}
-            style={{ display: "flex", alignItems: "center" }}
+            style={{ display: 'flex', alignItems: 'center' }}
           >
             <div className={styles.items}>
               <FileIcon size={24} />
               {keyfiles.length > 0
-                ? "Add more keyfile(s)"
-                : "Load keyfile(s) from filesystem"}
+                ? 'Add more keyfile(s)'
+                : 'Load keyfile(s) from filesystem'}
             </div>
           </Card>
         </Modal.Content>
@@ -477,10 +477,10 @@ export default function App() {
           <Textarea
             value={seed}
             readOnly
-            className={styles.Seed + " " + styles.NewSeed}
+            className={styles.Seed + ' ' + styles.NewSeed}
           ></Textarea>
-          <p style={{ textAlign: "center" }}>...and download your keyfile.</p>
-          <Button onClick={downloadSeedWallet} style={{ width: "100%" }}>
+          <p style={{ textAlign: 'center' }}>...and download your keyfile.</p>
+          <Button onClick={downloadSeedWallet} style={{ width: '100%' }}>
             Download
           </Button>
         </Modal.Content>
@@ -491,18 +491,18 @@ export default function App() {
       <Modal {...feeModal.bindings}>
         <Modal.Title>Tips</Modal.Title>
         <Modal.Content>
-          <p style={{ textAlign: "justify" }}>
-            We at{" "}
+          <p style={{ textAlign: 'justify' }}>
+            We at{' '}
             <a
               href="https://th8ta.org"
               target="_blank"
               rel="noopener noreferrer"
             >
               th8ta
-            </a>{" "}
+            </a>{' '}
             are working hard to bring you the best experiences on the permaweb.
             Because of this, we take a small tip whenever a 3rd-party
-            application utilizes ArConnect. This tip goes to a randomly-selected{" "}
+            application utilizes ArConnect. This tip goes to a randomly-selected{' '}
             <Code>VRT</Code> token holder:
           </p>
           <ul>
@@ -532,15 +532,15 @@ export default function App() {
         </Modal.Subtitle>
         <Modal.Content>
           <Spacer h={0.5} />
-          <p style={{ fontWeight: 500, textAlign: "center" }}>
-            Important: this is for ArConnect config files,{" "}
+          <p style={{ fontWeight: 500, textAlign: 'center' }}>
+            Important: this is for ArConnect config files,{' '}
             <b>NOT ARWEAVE KEYFILES</b>
           </p>
           <Spacer h={0.5} />
           <Card
             className={styles.FileContent}
             onClick={() => configFileInput.current?.click()}
-            style={{ display: "flex", alignItems: "center" }}
+            style={{ display: 'flex', alignItems: 'center' }}
           >
             <div className={styles.items}>
               <FileIcon size={24} />

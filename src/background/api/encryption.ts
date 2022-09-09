@@ -1,11 +1,11 @@
-import { MessageFormat } from "../../utils/messenger";
+import { MessageFormat } from '../../utils/messenger';
 import {
   authenticateUser,
   getArweaveConfig,
   getStoreData
-} from "../../utils/background";
-import { JWKInterface } from "arweave/node/lib/wallet";
-import Arweave from "arweave";
+} from '../../utils/background';
+import { JWKInterface } from 'arweave/node/lib/wallet';
+import Arweave from 'arweave';
 
 // encrypt data using the user's keyfile
 export const encrypt = (message: MessageFormat, tabURL: string) =>
@@ -13,13 +13,13 @@ export const encrypt = (message: MessageFormat, tabURL: string) =>
     if (!message.data)
       return resolve({
         res: false,
-        message: "No data submitted"
+        message: 'No data submitted'
       });
 
     if (!message.options)
       return resolve({
         res: false,
-        message: "No options submitted"
+        message: 'No options submitted'
       });
 
     try {
@@ -28,12 +28,12 @@ export const encrypt = (message: MessageFormat, tabURL: string) =>
       resolve({
         res: true,
         data: await doEncrypt(message),
-        message: "Success"
+        message: 'Success'
       });
     } catch {
       resolve({
         res: false,
-        message: "Error encrypting data"
+        message: 'Error encrypting data'
       });
     }
   });
@@ -43,13 +43,13 @@ export const decrypt = (message: MessageFormat, tabURL: string) =>
     if (!message.data)
       return resolve({
         res: false,
-        message: "No data submitted"
+        message: 'No data submitted'
       });
 
     if (!message.options)
       return resolve({
         res: false,
-        message: "No options submitted"
+        message: 'No options submitted'
       });
 
     try {
@@ -58,12 +58,12 @@ export const decrypt = (message: MessageFormat, tabURL: string) =>
       resolve({
         res: true,
         data: await doDecrypt(message),
-        message: "Success"
+        message: 'Success'
       });
     } catch {
       resolve({
         res: false,
-        message: "Error decrypting data"
+        message: 'Error decrypting data'
       });
     }
   });
@@ -73,13 +73,13 @@ export const signature = (message: MessageFormat, tabURL: string) =>
     if (!message.data)
       return resolve({
         res: false,
-        message: "No data submitted"
+        message: 'No data submitted'
       });
 
     if (!message.options)
       return resolve({
         res: false,
-        message: "No options submitted"
+        message: 'No options submitted'
       });
 
     try {
@@ -90,12 +90,12 @@ export const signature = (message: MessageFormat, tabURL: string) =>
       resolve({
         res: true,
         data: Object.values(signatureObject),
-        message: "Success"
+        message: 'Success'
       });
     } catch (e: any) {
       resolve({
         res: false,
-        message: e.message || "Error signing data"
+        message: e.message || 'Error signing data'
       });
     }
   });
@@ -103,26 +103,26 @@ export const signature = (message: MessageFormat, tabURL: string) =>
 async function doEncrypt(message: MessageFormat) {
   const arweave = new Arweave(await getArweaveConfig()),
     storeData = await getStoreData(),
-    storedKeyfiles = storeData?.["wallets"],
-    storedAddress = storeData?.["profile"],
+    storedKeyfiles = storeData?.['wallets'],
+    storedAddress = storeData?.['profile'],
     keyfileToDecrypt = storedKeyfiles?.find(
       (item) => item.address === storedAddress
     )?.keyfile;
 
   // this should not happen, we already check for wallets in background.ts
   if (!storedKeyfiles || !storedAddress || !keyfileToDecrypt)
-    throw new Error("No wallets added");
+    throw new Error('No wallets added');
 
   const keyfile: JWKInterface = JSON.parse(atob(keyfileToDecrypt)),
     obj = {
-      kty: "RSA",
-      e: "AQAB",
+      kty: 'RSA',
+      e: 'AQAB',
       n: keyfile.n,
-      alg: "RSA-OAEP-256",
+      alg: 'RSA-OAEP-256',
       ext: true
     },
     key = await crypto.subtle.importKey(
-      "jwk",
+      'jwk',
       obj,
       {
         name: message.options.algorithm,
@@ -131,11 +131,11 @@ async function doEncrypt(message: MessageFormat) {
         }
       },
       false,
-      ["encrypt"]
+      ['encrypt']
     );
 
   const dataBuf = new TextEncoder().encode(
-      message.data + (message.options.salt || "")
+      message.data + (message.options.salt || '')
     ),
     array = new Uint8Array(256);
 
@@ -156,23 +156,23 @@ async function doEncrypt(message: MessageFormat) {
 async function doDecrypt(message: MessageFormat) {
   const arweave = new Arweave(await getArweaveConfig()),
     storeData = await getStoreData(),
-    storedKeyfiles = storeData?.["wallets"],
-    storedAddress = storeData?.["profile"],
+    storedKeyfiles = storeData?.['wallets'],
+    storedAddress = storeData?.['profile'],
     keyfileToDecrypt = storedKeyfiles?.find(
       (item) => item.address === storedAddress
     )?.keyfile;
 
   if (!storedKeyfiles || !storedAddress || !keyfileToDecrypt)
-    throw new Error("No wallets added");
+    throw new Error('No wallets added');
 
   const keyfile: JWKInterface = JSON.parse(atob(keyfileToDecrypt)),
     obj = {
       ...keyfile,
-      alg: "RSA-OAEP-256",
+      alg: 'RSA-OAEP-256',
       ext: true
     },
     key = await crypto.subtle.importKey(
-      "jwk",
+      'jwk',
       obj,
       {
         name: message.options.algorithm,
@@ -181,7 +181,7 @@ async function doDecrypt(message: MessageFormat) {
         }
       },
       false,
-      ["decrypt"]
+      ['decrypt']
     );
 
   const encryptedKey = new Uint8Array(
@@ -207,28 +207,28 @@ async function doDecrypt(message: MessageFormat) {
 
 async function doSignature(message: MessageFormat) {
   const storeData = await getStoreData(),
-    storedKeyfiles = storeData?.["wallets"],
-    storedAddress = storeData?.["profile"],
+    storedKeyfiles = storeData?.['wallets'],
+    storedAddress = storeData?.['profile'],
     keyfileToDecrypt = storedKeyfiles?.find(
       (item) => item.address === storedAddress
     )?.keyfile;
 
   if (!storedKeyfiles || !storedAddress || !keyfileToDecrypt)
-    throw new Error("No wallets added");
+    throw new Error('No wallets added');
 
   const keyfile: JWKInterface = JSON.parse(atob(keyfileToDecrypt));
 
   const cryptoKey = await crypto.subtle.importKey(
-    "jwk",
+    'jwk',
     keyfile,
     {
-      name: "RSA-PSS",
+      name: 'RSA-PSS',
       hash: {
-        name: "SHA-256"
+        name: 'SHA-256'
       }
     },
     false,
-    ["sign"]
+    ['sign']
   );
 
   const signature = await crypto.subtle.sign(

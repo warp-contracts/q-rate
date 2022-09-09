@@ -6,7 +6,7 @@ export interface Asset {
   arBalance: number;
   logo?: string;
   removed: boolean;
-  type: "community" | "collectible";
+  type: 'community' | 'collectible';
 }
 
 export interface AssetStateItem {
@@ -15,7 +15,7 @@ export interface AssetStateItem {
 }
 
 export interface IAssetsAction {
-  type: "UPDATE_ASSETS" | "USER_SIGNOUT" | "REMOVE_ASSETS" | "READD_ASSETS";
+  type: 'UPDATE_ASSETS' | 'USER_SIGNOUT' | 'REMOVE_ASSETS' | 'READD_ASSETS';
   payload: {
     address: string;
     assets?: Asset[];
@@ -28,14 +28,14 @@ export default function assetsReducer(
   action: IAssetsAction
 ): AssetStateItem[] {
   switch (action.type) {
-    case "UPDATE_ASSETS":
+    case 'UPDATE_ASSETS':
       if (!action.payload.assets) break;
       return [
         ...state.filter(({ address }) => address !== action.payload.address),
         { address: action.payload.address, assets: action.payload.assets }
       ];
 
-    case "REMOVE_ASSETS":
+    case 'REMOVE_ASSETS':
       if (!action.payload.id) break;
       return state.map(({ address, assets }) => ({
         address,
@@ -48,7 +48,7 @@ export default function assetsReducer(
             : assets
       }));
 
-    case "READD_ASSETS":
+    case 'READD_ASSETS':
       if (!action.payload.id) break;
       return state.map(({ address, assets }) => ({
         address,
@@ -61,7 +61,7 @@ export default function assetsReducer(
             : assets
       }));
 
-    case "USER_SIGNOUT":
+    case 'USER_SIGNOUT':
       return [];
   }
 

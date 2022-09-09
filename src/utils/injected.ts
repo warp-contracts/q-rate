@@ -1,5 +1,5 @@
-import { MessageFormat, validateMessage, MessageType } from "./messenger";
-import arweaveLogo from "../assets/arweave.png";
+import { MessageFormat, validateMessage, MessageType } from './messenger';
+import arweaveLogo from '../assets/arweave.png';
 
 /**
  * Create an overlay for pending actions
@@ -8,7 +8,7 @@ import arweaveLogo from "../assets/arweave.png";
  * @returns overlay html
  */
 export function createOverlay(text: string) {
-  const container = document.createElement("div");
+  const container = document.createElement('div');
   container.innerHTML = `
     <div style="position: fixed; top: 0; bottom: 0; left: 0; right: 0; z-index: 1000000000000; background-color: rgba(0, 0, 0, .73); font-family: 'Inter', sans-serif;">
       <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff;">
@@ -25,23 +25,23 @@ export function createOverlay(text: string) {
  * Create an animation for transactions
  */
 export function createCoinWithAnimation() {
-  const arCoin = document.createElement("img"),
+  const arCoin = document.createElement('img'),
     pos = { x: 0, y: 0 },
     id = `ar-coin-animation-${
-      document.querySelectorAll(".ar-coing-animation").length
+      document.querySelectorAll('.ar-coing-animation').length
     }`;
   let visibility = 100;
 
-  arCoin.setAttribute("src", arweaveLogo);
-  arCoin.setAttribute("alt", "a");
-  arCoin.style.position = "fixed";
-  arCoin.style.bottom = "0";
+  arCoin.setAttribute('src', arweaveLogo);
+  arCoin.setAttribute('alt', 'a');
+  arCoin.style.position = 'fixed';
+  arCoin.style.bottom = '0';
   arCoin.style.right = `${Math.floor(Math.random() * 30)}px`;
-  arCoin.style.width = "18px";
-  arCoin.style.zIndex = "1000000";
-  arCoin.style.transition = "all .23s ease";
+  arCoin.style.width = '18px';
+  arCoin.style.zIndex = '1000000';
+  arCoin.style.transition = 'all .23s ease';
   arCoin.id = id;
-  arCoin.classList.add("ar-coing-animation");
+  arCoin.classList.add('ar-coing-animation');
   document.body.appendChild(arCoin);
 
   // @ts-ignore
@@ -61,18 +61,18 @@ export function createCoinWithAnimation() {
 
 let messageId = 0;
 
-export const callAPI = (message: Omit<MessageFormat, "ext" | "sender">) =>
+export const callAPI = (message: Omit<MessageFormat, 'ext' | 'sender'>) =>
   new Promise<void | any>((resolve, reject) => {
     // give every message a unique autoincrementing id
     const id = messageId;
     message.id = id;
     messageId += 1;
     window.postMessage(
-      { ...message, ext: "arconnect", sender: "api" },
+      { ...message, ext: 'arconnect', sender: 'api' },
       window.location.origin
     );
 
-    window.addEventListener("message", callback);
+    window.addEventListener('message', callback);
 
     // @ts-ignore
     function callback(e: MessageEvent<any>) {
@@ -86,7 +86,7 @@ export const callAPI = (message: Omit<MessageFormat, "ext" | "sender">) =>
       // only resolve when the result matching our message.id is deleivered
       if (id !== e.data?.id) return;
 
-      window.removeEventListener("message", callback);
+      window.removeEventListener('message', callback);
       if (e.data?.res === false) reject(e.data?.message);
       else resolve(e.data);
     }
