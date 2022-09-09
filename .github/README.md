@@ -18,7 +18,9 @@ Imagine the situation - you are a big player and you want to stake 4 QRT tokens 
 
 ## Contract
 
-The contract has been already deployed using [Arweave blockchain](https://arweave.org) and [Warp contracts SDK](https://github.com/warp-contracts/warp). You can view the contract within its contracts source, transactions and current state in [SonAr](https://sonar.warp.cc/#/app/contract/SaGNYkJaCiOjYYKBZUi8zvhS5R8gm_aFKWALKdGitYo).
+The contract has been already deployed using [Arweave blockchain](https://arweave.org) and [Warp contracts SDK](https://github.com/warp-contracts/warp).   
+The contract's source code is available [here](https://github.com/warp-contracts/warp-wasm-contracts/tree/main/assemblyscript/token-based-disputes).  
+You can also view the contract with its source, transactions and current state in [SonAr](https://sonar.warp.cc/#/app/contract/SaGNYkJaCiOjYYKBZUi8zvhS5R8gm_aFKWALKdGitYo).
 
 ## Run locally
 
