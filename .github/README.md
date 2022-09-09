@@ -20,10 +20,6 @@ Imagine the situation - you are a big player and you want to stake 4 QRT tokens 
 
 The contract has been already deployed using [Arweave blockchain](https://arweave.org) and [Warp contracts SDK](https://github.com/warp-contracts/warp). You can view the contract within its contracts source, transactions and current state in [SonAr](https://sonar.warp.cc/#/app/contract/SaGNYkJaCiOjYYKBZUi8zvhS5R8gm_aFKWALKdGitYo).
 
-## Install
-
-Visit [Google Chrome Web Store](https://chrome.google.com/webstore/detail/q-rate/jeciickbndbjeappebgjkmhkbpmdieme) and add QRate to your extensions. You're ready to go!
-
 ## Run locally
 
 1. Install the dependencies:
